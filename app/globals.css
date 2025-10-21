@@ -1,26 +1,96 @@
-@import "tailwindcss";
+/* app/globals.css */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Tailwind (keep) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme */
+:root{
+  --burgundy:#7B0F24;
+  --gold:#FFD700;
+  --text:#fff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Base */
+*{box-sizing:border-box}
+html,body,#__next{height:100%}
+body{
+  margin:0;
+  background:var(--burgundy);
+  color:var(--text);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  line-height:1.5;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Thin gold border */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  border:2px solid var(--gold);
+  border-radius:10px;
+  pointer-events:none;
+  z-index:9999;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ONE button style to use everywhere */
+.btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:#fff !important;
+  color:#111 !important;
+  border:1px solid var(--gold) !important;
+  border-radius:12px !important;
+
+  padding:12px 24px !important;
+  font-size:20px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  text-decoration:none !important;
+
+  box-shadow:0 2px 0 rgba(0,0,0,.35) !important;
+  transition:background .2s ease, box-shadow .2s ease !important;
+}
+.btn:hover{ background:#fff3c4 !important }
+
+/* SAFETY NET: if the Login link has no class, style by href */
+a[href*="/login" i]{
+  composes: btn;
+  /* If your build doesn’t support `composes`, duplicate the .btn rules: */
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#fff !important;
+  color:#111 !important;
+  border:1px solid var(--gold) !important;
+  border-radius:12px !important;
+  padding:12px 24px !important;
+  font-size:20px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  text-decoration:none !important;
+  box-shadow:0 2px 0 rgba(0,0,0,.35) !important;
+  transition:background .2s ease, box-shadow .2s ease !important;
+}
+a[href*="/login" i]:hover{ background:#fff3c4 !important }
+/* === Make 'Create an account' visible and gold === */
+a[href*="signup" i],
+a[href*="register" i],
+a[href*="create-account" i],
+a[href*="create" i],
+a[href*="account" i] {
+  color: #FFD700 !important;          /* bright gold text */
+  font-weight: 700 !important;        /* bold */
+  text-decoration: underline !important;
+  font-size: 18px !important;
+}
+
+a[href*="signup" i]:hover,
+a[href*="register" i]:hover,
+a[href*="create-account" i]:hover,
+a[href*="create" i]:hover,
+a[href*="account" i]:hover {
+  color: #fff3c4 !important;          /* lighter gold hover */
 }
