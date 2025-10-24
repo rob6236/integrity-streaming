@@ -4,7 +4,6 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// --- Your Firebase config (Integrity Streaming) ---
 const firebaseConfig = {
   apiKey: "AIzaSyBP3UUhArTXN-vZhNxWYnNPtAJGyXNy0YI",
   authDomain: "integrity-streaming-4c27a.firebaseapp.com",
@@ -14,12 +13,9 @@ const firebaseConfig = {
   appId: "1:58399697022:web:6e21b545f1a69aeb73502f",
 };
 
-// Make sure we don't reinitialize on hot reloads
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Email/Password only (no Google provider exported)
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-
 export default app;
