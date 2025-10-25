@@ -1,96 +1,138 @@
-/* app/globals.css */
+/* ========= 1) Font import MUST be first (after @charset if present) ========= */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@1,900&display=swap');
 
-/* Tailwind (keep) */
+/* ========= 2) Tailwind ========= */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Theme */
-:root{
-  --burgundy:#7B0F24;
-  --gold:#FFD700;
-  --text:#fff;
+/* ========= 3) Base page styling ========= */
+:root {
+  --burgundy: #7B0F24;
+  --gold: #FFD700;
+  --ivory: #FFF9F0;
 }
 
-/* Base */
-*{box-sizing:border-box}
-html,body,#__next{height:100%}
-body{
-  margin:0;
-  background:var(--burgundy);
-  color:var(--text);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-  line-height:1.5;
+html, body {
+  background: var(--burgundy);
+  color: white;
+  min-height: 100%;
 }
 
-/* Thin gold border */
-body::before{
-  content:"";
-  position:fixed; inset:0;
-  border:2px solid var(--gold);
-  border-radius:10px;
-  pointer-events:none;
-  z-index:9999;
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ONE button style to use everywhere */
-.btn{
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
+img, svg, video, canvas { max-width: 100%; height: auto; }
+input, textarea, button, select { font: inherit; }
 
-  background:#fff !important;
-  color:#111 !important;
-  border:1px solid var(--gold) !important;
-  border-radius:12px !important;
-
-  padding:12px 24px !important;
-  font-size:20px !important;
-  font-weight:900 !important;
-  line-height:1 !important;
-  text-decoration:none !important;
-
-  box-shadow:0 2px 0 rgba(0,0,0,.35) !important;
-  transition:background .2s ease, box-shadow .2s ease !important;
+/* ========= 4) Reusable gold buttons ========= */
+.gold-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: var(--burgundy);
+  font-weight: 700;
+  box-shadow:
+    0 0 0 1px rgba(255,215,0,0.6),
+    0 0 10px rgba(255,215,0,0.18);
+  transition: filter 120ms ease, transform 80ms ease;
 }
-.btn:hover{ background:#fff3c4 !important }
+.gold-button:hover { filter: brightness(1.08); }
+.gold-button:active { transform: translateY(1px); }
 
-/* SAFETY NET: if the Login link has no class, style by href */
-a[href*="/login" i]{
-  composes: btn;
-  /* If your build doesn’t support `composes`, duplicate the .btn rules: */
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  background:#fff !important;
-  color:#111 !important;
-  border:1px solid var(--gold) !important;
-  border-radius:12px !important;
-  padding:12px 24px !important;
-  font-size:20px !important;
-  font-weight:900 !important;
-  line-height:1 !important;
-  text-decoration:none !important;
-  box-shadow:0 2px 0 rgba(0,0,0,.35) !important;
-  transition:background .2s ease, box-shadow .2s ease !important;
+.gold-button-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: white;
+  font-weight: 700;
+  box-shadow:
+    0 0 0 1px rgba(255,215,0,0.6),
+    0 0 10px rgba(255,215,0,0.18);
+  transition: filter 120ms ease, transform 80ms ease, background-color 120ms ease;
 }
-a[href*="/login" i]:hover{ background:#fff3c4 !important }
-/* === Make 'Create an account' visible and gold === */
-a[href*="signup" i],
-a[href*="register" i],
-a[href*="create-account" i],
-a[href*="create" i],
-a[href*="account" i] {
-  color: #FFD700 !important;          /* bright gold text */
-  font-weight: 700 !important;        /* bold */
-  text-decoration: underline !important;
-  font-size: 18px !important;
+.gold-button-outline:hover { filter: brightness(1.08); background: rgba(255,215,0,0.08); }
+.gold-button-outline:active { transform: translateY(1px); }
+
+/* ========= 5) Header helper (non-sticky) ========= */
+.site-header {}
+
+/* ========= 6) GOLD TITLE (text, no image) ========= */
+.is-title {
+  /* font */
+  font-family: 'Merriweather', serif;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: 0.5px;
+
+  /* bright gold fill */
+  background: linear-gradient(
+    180deg,
+    #fff6c4 0%,
+    #ffe47a 25%,
+    #ffd700 55%,
+    #ffc300 80%,
+    #ffec8a 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  /* crisp edge + soft glow (kept subtle so it stays gold) */
+  -webkit-text-stroke: 0.6px #5f0c1b; /* burgundy edge for contrast */
+  text-shadow:
+    0 0 6px rgba(255, 215, 0, 0.35),
+    0 2px 10px rgba(255, 215, 0, 0.25);
 }
 
-a[href*="signup" i]:hover,
-a[href*="register" i]:hover,
-a[href*="create-account" i]:hover,
-a[href*="create" i]:hover,
-a[href*="account" i]:hover {
-  color: #fff3c4 !important;          /* lighter gold hover */
+/* responsive sizing for the title */
+@media (max-width: 480px) { .is-title { font-size: 28px; } }
+@media (min-width: 481px) and (max-width: 768px) { .is-title { font-size: 34px; } }
+@media (min-width: 769px) { .is-title { font-size: 42px; } }
+
+/* --- Auth input system --- */
+.is-field { margin-top: 6px; }
+
+.is-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #2b0a12;                /* deep burgundy text */
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  padding: 10px 12px;            /* inner padding */
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(255,215,0,.35),
+    0 0 8px rgba(255,215,0,.18);
+}
+.is-input::placeholder { color: #7a7a7a; }
+.is-input:focus {
+  box-shadow:
+    0 0 0 2px rgba(255,215,0,.55),
+    0 0 10px rgba(255,215,0,.25);
+}
+
+/* keep input+button group tidy (password Show/Hide) */
+.is-input-group {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.is-input-group .is-input { flex: 1 1 auto; }
+.is-input-group .is-tog {
+  white-space: nowrap;
+  padding: 0 12px;
+  border-radius: 12px;
 }

@@ -1,103 +1,136 @@
-// app/signup/page.tsx
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/app/lib/firebase";
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/app/lib/firebase';
 
 export default function SignupPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [pwd, setPwd] = useState('');
+  const [pwd2, setPwd2] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
-    if (!name.trim()) {
-      setError("Please enter your name.");
+    setErr(null);
+    if (pwd !== pwd2) {
+      setErr('Passwords do not match.');
       return;
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-
+    setLoading(true);
     try {
-      setBusy(true);
-      const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      // Save display name so it can be shown on profile pages later
-      if (auth.currentUser) {
-        await updateProfile(auth.currentUser, { displayName: name.trim() });
-      }
-      // Go to home (or /profile if you prefer)
-      router.push("/");
-    } catch (err: any) {
-      setError(err?.message || "Sign up failed. Please try again.");
+      await createUserWithEmailAndPassword(auth, email.trim(), pwd);
+      router.push('/home');
+    } catch (e: any) {
+      setErr(e?.message ?? 'Signup failed. Please try again.');
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-svh flex items-center justify-center px-4">
-      <div className="w-full max-w-md gold-outline p-6 bg-[#7B0F24] border border-[#FFD700] rounded-xl">
-        <h1 className="text-2xl font-extrabold text-[#FFD700] mb-4">Create your account</h1>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-semibold">Name *</label>
-            <input
-              className="w-full"
-              placeholder="Your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+    <main
+      className="min-h-screen bg-[#7B0F24] text-white grid place-items-center py-10"
+      style={{ paddingLeft: '1in', paddingRight: '1in' }}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl border border-[#FFD700] p-6 sm:p-8"
+        style={{
+          boxShadow: '0 0 0 1px rgba(255,215,0,.6), 0 0 10px rgba(255,215,0,.18)',
+          minHeight: 520,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '18px',
+        }}
+      >
+        <div className="text-center">
+          <div className="is-title text-[30px] sm:text-[38px] leading-none">
+            Integrity Streaming
           </div>
-          <div>
-            <label className="block mb-1 font-semibold">Email *</label>
-            <input
-              className="w-full"
-              placeholder="you@example.com"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Password *</label>
-            <input
-              className="w-full"
-              placeholder="••••••••"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
-              required
-            />
-          </div>
+          <p className="text-white/85 text-sm mt-3">Create your account.</p>
+        </div>
 
-          {error && (
-            <p className="text-red-300 font-semibold">{error}</p>
+        <form onSubmit={handleSignup} className="space-y-5 px-1">
+          <label className="block">
+            <span className="text-sm">Email</span>
+            <div className="is-field">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="is-input"
+                placeholder="you@example.com"
+                autoComplete="email"
+              />
+            </div>
+          </label>
+
+          <label className="block">
+            <span className="text-sm">Password</span>
+            <div className="is-field is-input-group">
+              <input
+                type={showPwd ? 'text' : 'password'}
+                required
+                minLength={8}
+                value={pwd}
+                onChange={(e) => setPwd(e.target.value)}
+                className="is-input"
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd((s) => !s)}
+                className="gold-button-outline is-tog"
+              >
+                {showPwd ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </label>
+
+          <label className="block">
+            <span className="text-sm">Confirm password</span>
+            <div className="is-field">
+              <input
+                type={showPwd ? 'text' : 'password'}
+                required
+                minLength={8}
+                value={pwd2}
+                onChange={(e) => setPwd2(e.target.value)}
+                className="is-input"
+                placeholder="Repeat password"
+                autoComplete="new-password"
+              />
+            </div>
+          </label>
+
+          {err && (
+            <div className="rounded-lg border border-red-400 bg-red-900/30 text-red-200 text-sm p-3">
+              {err}
+            </div>
           )}
 
-          <button type="submit" className="btn w-full" disabled={busy}>
-            {busy ? "Creating..." : "Create Account"}
+          <button type="submit" className="gold-button w-full rounded-xl py-3" disabled={loading}>
+            {loading ? 'Creating…' : 'Create account'}
           </button>
         </form>
 
-        <p className="mt-4">
-          Already have an account?{" "}
-          <Link href="/login" className="underline text-[#FFD700] font-bold">
-            Log in
-          </Link>
-        </p>
+        <div className="mt-5">
+          <div className="flex items-center justify-between text-sm px-5 py-3">
+            <Link href="/login" className="underline text-[#FFD700] hover:opacity-90">
+              Already have an account? Login
+            </Link>
+            <Link href="/forgot-password" className="underline text-[#FFD700] hover:opacity-90">
+              Forgot password
+            </Link>
+          </div>
+        </div>
       </div>
     </main>
   );

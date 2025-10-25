@@ -1,79 +1,117 @@
 // app/login/page.tsx
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/app/lib/firebase";
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/app/lib/firebase';
 
 export default function LoginPage() {
   const router = useRouter();
-  const params = useSearchParams();
-  const next = params.get("next") || "/";
+  const [email, setEmail] = useState('');
+  const [pwd, setPwd] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function onSubmit(e: React.FormEvent) {
+  async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    setErr(null);
+    setLoading(true);
     try {
-      setBusy(true);
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.push(next);
-    } catch (err: any) {
-      setError(err?.message || "Login failed. Please try again.");
+      await signInWithEmailAndPassword(auth, email.trim(), pwd);
+      router.push('/home');
+    } catch (e: any) {
+      setErr(e?.message ?? 'Login failed. Please try again.');
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-svh flex items-center justify-center px-4">
-      <div className="w-full max-w-md gold-outline p-6 bg-[#7B0F24] border border-[#FFD700] rounded-xl">
-        <h1 className="text-2xl font-extrabold text-[#FFD700] mb-4">Log in</h1>
-
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-semibold">Email</label>
-            <input
-              className="w-full"
-              placeholder="you@example.com"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <main
+      className="min-h-screen bg-[#7B0F24] text-white grid place-items-center py-10"
+      style={{ paddingLeft: '1in', paddingRight: '1in' }}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl border border-[#FFD700] p-6 sm:p-8"
+        style={{
+          boxShadow: '0 0 0 1px rgba(255,215,0,.6), 0 0 10px rgba(255,215,0,.18)',
+          minHeight: 520,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '18px',
+        }}
+      >
+        <div className="text-center">
+          <div className="is-title text-[30px] sm:text-[38px] leading-none">
+            Integrity Streaming
           </div>
-          <div>
-            <label className="block mb-1 font-semibold">Password</label>
-            <input
-              className="w-full"
-              placeholder="••••••••"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <p className="text-white/85 text-sm mt-3">Welcome back. Please sign in.</p>
+        </div>
 
-          {error && <p className="text-red-300 font-semibold">{error}</p>}
+        <form onSubmit={handleEmailLogin} className="space-y-5 px-1">
+          <label className="block">
+            <span className="text-sm">Email</span>
+            <div className="is-field">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="is-input"
+                placeholder="you@example.com"
+                autoComplete="email"
+                inputMode="email"
+              />
+            </div>
+          </label>
 
-          <button type="submit" className="btn w-full" disabled={busy}>
-            {busy ? "Logging in..." : "Login"}
+          <label className="block">
+            <span className="text-sm">Password</span>
+            <div className="is-field is-input-group">
+              <input
+                type={showPwd ? 'text' : 'password'}
+                required
+                value={pwd}
+                onChange={(e) => setPwd(e.target.value)}
+                className="is-input"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                minLength={8}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPwd((s) => !s)}
+                className="gold-button-outline is-tog"
+                aria-label="Toggle password visibility"
+              >
+                {showPwd ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </label>
+
+          {err && (
+            <div className="rounded-lg border border-red-400 bg-red-900/30 text-red-200 text-sm p-3">
+              {err}
+            </div>
+          )}
+
+          <button type="submit" className="gold-button w-full rounded-xl py-3" disabled={loading}>
+            {loading ? 'Signing in…' : 'Login'}
           </button>
         </form>
 
-        <div className="mt-4 flex items-center justify-between">
-          <Link href="/signup" className="underline text-[#FFD700] font-bold">
-            Create an account
-          </Link>
-          <Link href="/forgot-password" className="underline text-[#FFD700] font-bold">
-            Forgot password?
-          </Link>
+        <div className="mt-5">
+          <div className="flex items-center justify-between text-sm px-5 py-3">
+            <Link href="/forgot-password" className="underline text-[#FFD700] hover:opacity-90">
+              Forgot password?
+            </Link>
+            <Link href="/signup" className="underline text-[#FFD700] hover:opacity-90">
+              Create an account
+            </Link>
+          </div>
         </div>
       </div>
     </main>

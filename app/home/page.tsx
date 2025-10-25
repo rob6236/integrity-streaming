@@ -175,7 +175,7 @@ function FeedCard({
 export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-[1200px] px-4 md:px-6 pb-16">
-      {/* HEADER (unchanged) */}
+      {/* HEADER */}
       <div style={goldOutline({ background: "transparent", padding: 16, marginTop: 16 })}>
         <div
           style={{
@@ -215,21 +215,18 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Title (centered) */}
+          {/* Title (centered, gold serif text) */}
           <div
             style={{
-              textAlign: "center",
               justifySelf: "center",
               alignSelf: "center",
-              color: ivory,
-              fontSize: 28,
-              fontWeight: 800,
-              lineHeight: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               padding: "0 8px",
-              whiteSpace: "nowrap",
             }}
           >
-            Integrity Streaming
+            <div className="is-title">Integrity Streaming</div>
           </div>
 
           {/* Buttons (right) */}
@@ -260,7 +257,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* TWO-COLUMN BODY: Left = all video rows, Right = Social feed (unchanged) */}
+      {/* TWO-COLUMN BODY: Left = all video rows, Right = Social feed */}
       <div
         style={{
           display: "grid",
@@ -305,7 +302,7 @@ export default function HomePage() {
           <VideoRow compact />
         </section>
 
-        {/* RIGHT: Social Feeds column (UNCHANGED) */}
+        {/* RIGHT: Social Feeds column */}
         <aside>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <h2 style={{ fontWeight: 700, fontSize: 18, color: ivory }}>Social Feeds</h2>
