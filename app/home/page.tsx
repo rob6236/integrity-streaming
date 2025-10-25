@@ -14,8 +14,7 @@ function goldOutline(style: CSSProperties = {}): CSSProperties {
   return {
     border: `1px solid ${gold}`,
     borderRadius: 16,
-    boxShadow:
-      "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+    boxShadow: "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
     ...style,
   };
 }
@@ -23,10 +22,7 @@ function goldOutline(style: CSSProperties = {}): CSSProperties {
 /* ---- Small UI bits ---- */
 function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <button
-      className="gold-button-outline"
-      style={{ borderRadius: 12, padding: "8px 14px" }}
-    >
+    <button className="gold-button-outline" style={{ borderRadius: 12, padding: "8px 14px" }}>
       {children}
     </button>
   );
@@ -39,8 +35,7 @@ function MetricChip({ label }: { label: string }) {
         padding: "4px 8px",
         borderRadius: 10,
         border: `1px solid ${gold}`,
-        boxShadow:
-          "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+        boxShadow: "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
         fontSize: 13,
       }}
     >
@@ -49,6 +44,7 @@ function MetricChip({ label }: { label: string }) {
   );
 }
 
+/* ---- Video tiles & rows ---- */
 function VideoTile({ compact = false }: { compact?: boolean }) {
   return (
     <div style={goldOutline({ background: cardBg, padding: 16 })}>
@@ -61,12 +57,8 @@ function VideoTile({ compact = false }: { compact?: boolean }) {
           marginBottom: 12,
         }}
       />
-      <div style={{ color: ivory, fontSize: 15, fontWeight: 600 }}>
-        Video title goes here
-      </div>
-      <div style={{ opacity: 0.8, fontSize: 13, marginTop: 2 }}>
-        Channel • 12k views • 2 days ago
-      </div>
+      <div style={{ color: ivory, fontSize: 15, fontWeight: 600 }}>Video title goes here</div>
+      <div style={{ opacity: 0.8, fontSize: 13, marginTop: 2 }}>Channel • 12k views • 2 days ago</div>
       <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
         <button className="gold-button">Watch</button>
         <button className="gold-button-outline">Save</button>
@@ -76,6 +68,35 @@ function VideoTile({ compact = false }: { compact?: boolean }) {
   );
 }
 
+function RowHeader({ title }: { title: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 18, marginBottom: 8 }}>
+      <h2 style={{ fontWeight: 700, fontSize: 18, color: ivory }}>{title}</h2>
+      <div style={{ marginLeft: "auto" }}>
+        <Pill>View all</Pill>
+      </div>
+    </div>
+  );
+}
+
+function VideoRow({ compact = true }: { compact?: boolean }) {
+  // 6 demo items
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 16,
+      }}
+    >
+      {Array.from({ length: 6 }).map((_, i) => (
+        <VideoTile key={i} compact={compact} />
+      ))}
+    </div>
+  );
+}
+
+/* ---- Feed card (RIGHT COLUMN – unchanged) ---- */
 function FeedCard({
   name,
   handle,
@@ -126,8 +147,7 @@ function FeedCard({
                   padding: "2px 6px",
                   borderRadius: 999,
                   border: `1px solid ${gold}`,
-                  boxShadow:
-                    "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+                  boxShadow: "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
                 }}
               >
                 {c}
@@ -155,14 +175,8 @@ function FeedCard({
 export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-[1200px] px-4 md:px-6 pb-16">
-      {/* HEADER: logo (left) | title (center) | buttons (right) */}
-      <div
-        style={goldOutline({
-          background: "transparent",
-          padding: 16,
-          marginTop: 16,
-        })}
-      >
+      {/* HEADER (unchanged) */}
+      <div style={goldOutline({ background: "transparent", padding: 16, marginTop: 16 })}>
         <div
           style={{
             display: "grid",
@@ -219,34 +233,17 @@ export default function HomePage() {
           </div>
 
           {/* Buttons (right) */}
-          <div
-            style={{
-              display: "flex",
-              gap: 10,
-              justifySelf: "end",
-              alignItems: "center",
-            }}
-          >
+          <div style={{ display: "flex", gap: 10, justifySelf: "end", alignItems: "center" }}>
             <Pill>Home</Pill>
             <Pill>Create</Pill>
-            <Link
-              href="/login"
-              className="gold-button"
-              style={{ borderRadius: 12, padding: "8px 14px" }}
-            >
+            <Link href="/login" className="gold-button" style={{ borderRadius: 12, padding: "8px 14px" }}>
               Login
             </Link>
           </div>
         </div>
 
         {/* Search (centered under header) */}
-        <div
-          style={{
-            marginTop: 14,
-            display: "grid",
-            placeItems: "center",
-          }}
-        >
+        <div style={{ marginTop: 14, display: "grid", placeItems: "center" }}>
           <input
             placeholder="Search videos, channels, topics..."
             style={{
@@ -257,24 +254,24 @@ export default function HomePage() {
               outline: "none",
               background: "rgba(0,0,0,0.25)",
               color: ivory,
-              boxShadow:
-                "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+              boxShadow: "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
             }}
           />
         </div>
       </div>
 
-      {/* 3-column layout: Featured | two tiles | Social feed */}
+      {/* TWO-COLUMN BODY: Left = all video rows, Right = Social feed (unchanged) */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 420px 360px",
+          gridTemplateColumns: "1fr 360px", // left main + right social
           gap: 16,
           marginTop: 20,
         }}
       >
-        {/* Left: Featured (with inner golden frame) */}
+        {/* LEFT: ALL VIDEO SECTIONS AS ROWS */}
         <section>
+          {/* Featured */}
           <div style={goldOutline({ background: "transparent", padding: 14 })}>
             <div style={goldOutline({ background: "transparent", padding: 10 })}>
               <div
@@ -289,29 +286,29 @@ export default function HomePage() {
 
             <div style={{ marginTop: 12 }}>
               <div style={{ fontWeight: 700, color: ivory }}>Featured video</div>
-              <div style={{ opacity: 0.8, fontSize: 13 }}>
-                A curated, high-quality pick.
-              </div>
+              <div style={{ opacity: 0.8, fontSize: 13 }}>A curated, high-quality pick.</div>
               <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
                 <button className="gold-button">Play</button>
                 <button className="gold-button-outline">Add to queue</button>
               </div>
             </div>
           </div>
+
+          {/* Rows below featured */}
+          <RowHeader title="Suggested for you" />
+          <VideoRow compact />
+
+          <RowHeader title="Continue watching" />
+          <VideoRow compact />
+
+          <RowHeader title="Watch history" />
+          <VideoRow compact />
         </section>
 
-        {/* Middle: two stacked tiles */}
-        <section style={{ display: "grid", gap: 16 }}>
-          <VideoTile compact />
-          <VideoTile compact />
-        </section>
-
-        {/* Right: Social Feeds column with header & chips */}
+        {/* RIGHT: Social Feeds column (UNCHANGED) */}
         <aside>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <h2 style={{ fontWeight: 700, fontSize: 18, color: ivory }}>
-              Social Feeds
-            </h2>
+            <h2 style={{ fontWeight: 700, fontSize: 18, color: ivory }}>Social Feeds</h2>
             <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
               <Pill>Trending</Pill>
               <Pill>Following</Pill>
