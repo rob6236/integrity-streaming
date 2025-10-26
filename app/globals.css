@@ -94,3 +94,17 @@ a[href*="create" i]:hover,
 a[href*="account" i]:hover {
   color: #fff3c4 !important;          /* lighter gold hover */
 }
+
+/* === Auth Page Padding (1 inch left & right) === */
+.auth-page {
+  padding-left: 1in;
+  padding-right: 1in;
+}
+
+/* Force the header title to gold on all pages, without touching other text */
+header h1 {
+  color: #FFD700 !important;
+  font-style: italic;
+  font-weight: 800;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+}

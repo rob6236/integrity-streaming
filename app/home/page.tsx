@@ -215,22 +215,20 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Title (centered) */}
-          <div
-            style={{
-              textAlign: "center",
-              justifySelf: "center",
-              alignSelf: "center",
-              color: ivory,
-              fontSize: 28,
-              fontWeight: 800,
-              lineHeight: 1,
-              padding: "0 8px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Integrity Streaming
-          </div>
+          {/* Visible page header title */}
+<h1
+  id="isHeaderTitle"
+  className="text-center text-[40px] md:text-[44px] leading-none"
+  style={{
+    color: "#FFD700",
+    fontStyle: "italic",
+    fontWeight: 800,
+    textShadow: "2px 2px 4px rgba(0,0,0,0.6)",
+  }}
+>
+  Integrity <span style={{ fontStyle: "normal" }}>Streaming</span>
+</h1>
+
 
           {/* Buttons (right) */}
           <div style={{ display: "flex", gap: 10, justifySelf: "end", alignItems: "center" }}>
