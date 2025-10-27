@@ -1,99 +1,96 @@
-// app/forgot-password/page.tsx
+// C:\Users\rcwoo\integrity-streaming\app\forgot-password\page.tsx
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { sendPasswordResetEmail } from "firebase/auth";
-// If "@/lib/firebase" doesn't work for your tsconfig, change to:  "../lib/firebase"
 import { auth } from "@/lib/firebase";
+import Link from "next/link";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  async function onSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSent(false);
-
+    setError("");
     try {
-      setBusy(true);
-      await sendPasswordResetEmail(auth, email.trim(), {
-        url: "http://localhost:3000/reset",
-        handleCodeInApp: true,
-      });
+      await sendPasswordResetEmail(auth, email);
       setSent(true);
     } catch (err: any) {
-      setError(err?.message || "Could not send reset email. Please try again.");
-    } finally {
-      setBusy(false);
+      setError("Could not send reset email. Please check the address.");
     }
-  }
+  };
 
   return (
-    // Full-screen center
-    <div className="min-h-screen grid place-items-center bg-[#7B0F24]">
-      {/* SQUARE, centered, equal padding on all sides */}
-      <div className="w-[420px] aspect-square rounded-2xl border border-[#FFD700] bg-[#8A1128] shadow-[0_8px_30px_rgba(0,0,0,0.35)] p-6 flex flex-col">
-        {/* Content uses equal spacing inside the square */}
-        <div className="text-center mb-4">
-          <h1 className="text-xl font-extrabold text-[#FFD700]">Reset your password</h1>
-          <p className="text-white/85 text-sm mt-1">
+    <main className="grid min-h-screen place-items-center bg-[#7B0F24] text-white border-2 border-[#FFD700]">
+      <div
+        className="rounded-2xl border-2 border-[#FFD700] bg-[#7B0F24] shadow-lg"
+        style={{
+          width: "800px",
+          paddingLeft: "1in",
+          paddingRight: "1in",
+          paddingBottom: "1in",
+        }}
+      >
+        <div className="p-6">
+          <h1 className="text-3xl font-extrabold text-[#FFD700] mb-4">
+            Reset your password
+          </h1>
+          <p className="mb-6 text-sm">
             Enter your email and we’ll send a reset link.
           </p>
-        </div>
 
-        <form onSubmit={onSubmit} className="flex-1 flex flex-col gap-3">
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-white mb-1">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-[#FFD700] bg-black/20 text-white placeholder-white/70 px-3 py-2 outline-none focus:ring-2 focus:ring-yellow-300"
-            />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block font-semibold mb-1">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="you@example.com"
+                className="w-full rounded-md border border-[#FFD700] p-2 text-black"
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-400 text-sm font-semibold">{error}</p>
+            )}
+            {sent && (
+              <p className="text-green-300 text-sm font-semibold">
+                Reset email sent — check your inbox.
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full rounded-md border-2 border-[#FFD700] bg-white text-black font-bold py-2 hover:bg-gray-100"
+            >
+              Send reset email
+            </button>
+          </form>
+
+          {/* Only change: force gap below the Send button */}
+          <div
+            className="flex justify-between text-sm"
+            style={{ marginTop: "24px" }}
+          >
+            <Link
+              href="/login"
+              className="text-black bg-white px-3 py-2 rounded-xl font-extrabold border-2 border-[#FFD700]"
+            >
+              ← Back to login
+            </Link>
+            <Link href="/signup" className="text-[#FFD700] font-semibold">
+              Create an account
+            </Link>
           </div>
-
-          {error && (
-            <div className="rounded-md border border-red-400/60 bg-red-500/15 px-3 py-2 text-red-200 text-sm font-semibold">
-              {error}
-            </div>
-          )}
-          {sent && (
-            <div className="rounded-md border border-emerald-400/60 bg-emerald-500/15 px-3 py-2 text-emerald-200 text-sm font-semibold">
-              If an account exists for <span className="underline">{email}</span>, a reset link has been sent.
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={busy}
-            className="mt-auto w-full inline-flex items-center justify-center rounded-lg border border-[#FFD700] bg-white px-4 py-2.5 text-[16px] font-extrabold text-black shadow-sm transition hover:bg-[#fff3c4] disabled:opacity-75"
-          >
-            {busy ? "Sending…" : "Send reset email"}
-          </button>
-        </form>
-
-        <div className="mt-4 flex items-center justify-between">
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center rounded-lg border border-[#FFD700] bg-white px-3.5 py-2 text-[14px] font-bold text-black shadow-sm transition hover:bg-[#fff3c4]"
-          >
-            ← Back to login
-          </Link>
-          <Link href="/signup" className="text-[#FFD700] underline font-bold text-sm">
-            Create an account
-          </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
