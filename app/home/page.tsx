@@ -80,7 +80,6 @@ function RowHeader({ title }: { title: string }) {
 }
 
 function VideoRow({ compact = true }: { compact?: boolean }) {
-  // 6 demo items
   return (
     <div
       style={{
@@ -96,7 +95,7 @@ function VideoRow({ compact = true }: { compact?: boolean }) {
   );
 }
 
-/* ---- Feed card (RIGHT COLUMN – unchanged) ---- */
+/* ---- Feed card (RIGHT COLUMN) ---- */
 function FeedCard({
   name,
   handle,
@@ -175,7 +174,7 @@ function FeedCard({
 export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-[1200px] px-4 md:px-6 pb-16">
-      {/* HEADER (unchanged) */}
+      {/* HEADER */}
       <div style={goldOutline({ background: "transparent", padding: 16, marginTop: 16 })}>
         <div
           style={{
@@ -215,26 +214,38 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Visible page header title */}
-<h1
-  id="isHeaderTitle"
-  className="text-center text-[40px] md:text-[44px] leading-none"
-  style={{
-    color: "#FFD700",
-    fontStyle: "italic",
-    fontWeight: 800,
-    textShadow: "2px 2px 4px rgba(0,0,0,0.6)",
-  }}
->
-  Integrity <span style={{ fontStyle: "normal" }}>Streaming</span>
-</h1>
+          {/* Title */}
+          <h1
+            id="isHeaderTitle"
+            className="text-center text-[40px] md:text-[44px] leading-none"
+            style={{
+              color: "#FFD700",
+              fontStyle: "italic",
+              fontWeight: 800,
+              textShadow: "2px 2px 4px rgba(0,0,0,0.6)",
+            }}
+          >
+            Integrity <span style={{ fontStyle: "normal" }}>Streaming</span>
+          </h1>
 
-
-          {/* Buttons (right) */}
+          {/* Buttons (right) — all identical styling */}
           <div style={{ display: "flex", gap: 10, justifySelf: "end", alignItems: "center" }}>
-            <Pill>Home</Pill>
-            <Pill>Create</Pill>
-            <Link href="/login" className="gold-button" style={{ borderRadius: 12, padding: "8px 14px" }}>
+            <Link
+              href="/home"
+              className="px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all"
+            >
+              Home
+            </Link>
+            <Link
+              href="/create"
+              className="px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all"
+            >
+              Create
+            </Link>
+            <Link
+              href="/login"
+              className="px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all"
+            >
               Login
             </Link>
           </div>
@@ -258,16 +269,16 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* TWO-COLUMN BODY: Left = all video rows, Right = Social feed (unchanged) */}
+      {/* TWO-COLUMN BODY */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 360px", // left main + right social
+          gridTemplateColumns: "1fr 360px",
           gap: 16,
           marginTop: 20,
         }}
       >
-        {/* LEFT: ALL VIDEO SECTIONS AS ROWS */}
+        {/* LEFT: video sections */}
         <section>
           {/* Featured */}
           <div style={goldOutline({ background: "transparent", padding: 14 })}>
@@ -292,7 +303,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Rows below featured */}
+          {/* Rows */}
           <RowHeader title="Suggested for you" />
           <VideoRow compact />
 
@@ -303,7 +314,7 @@ export default function HomePage() {
           <VideoRow compact />
         </section>
 
-        {/* RIGHT: Social Feeds column (UNCHANGED) */}
+        {/* RIGHT: Social feed */}
         <aside>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <h2 style={{ fontWeight: 700, fontSize: 18, color: ivory }}>Social Feeds</h2>
