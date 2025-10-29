@@ -2,6 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import CreateButton from "@/app/_components/CreateButton";
+import LoginLogoutButton from "@/app/_components/LoginLogoutButton";
 
 /* ---- Theme helpers ---- */
 const gold = "rgba(255,215,0,0.90)";
@@ -228,7 +230,7 @@ export default function HomePage() {
             Integrity <span style={{ fontStyle: "normal" }}>Streaming</span>
           </h1>
 
-          {/* Buttons (right) — all identical styling */}
+          {/* Buttons (right) — Home link + reactive Create/Login/Logout */}
           <div style={{ display: "flex", gap: 10, justifySelf: "end", alignItems: "center" }}>
             <Link
               href="/home"
@@ -236,18 +238,8 @@ export default function HomePage() {
             >
               Home
             </Link>
-            <Link
-              href="/create"
-              className="px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all"
-            >
-              Create
-            </Link>
-            <Link
-              href="/login"
-              className="px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all"
-            >
-              Login
-            </Link>
+            <CreateButton />
+            <LoginLogoutButton />
           </div>
         </div>
 

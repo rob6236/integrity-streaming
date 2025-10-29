@@ -1,67 +1,45 @@
-// C:\Users\rcwoo\integrity-streaming\app\components\LoginLogoutButton.tsx
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  onIdTokenChanged,
-  signOut,
-  type User,
-} from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/lib/useAuth"; // <-- named import
 
-type Props = {
-  className?: string;
-};
+const btn =
+  "px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all";
 
-export default function LoginLogoutButton({ className = "" }: Props) {
+export default function LoginLogoutButton() {
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    // 1) Get whatever Firebase already knows right now (e.g., if you just logged in)
-    setUser(auth.currentUser ?? null);
-
-    // 2) Subscribe to auth token changes (more reliable than onAuthStateChanged)
-    const unsub = onIdTokenChanged(auth, (u) => {
-      setUser(u ?? null);
-      setReady(true);
-    });
-
-    return () => unsub();
-  }, []);
-
-  const handleClick = async () => {
-    if (user) {
-      // Currently logged in → sign out, then refresh the UI
-      await signOut(auth);
-      setUser(null);       // instant UI flip
-      router.replace("/home");
-      router.refresh();
-    } else {
-      // Not logged in → go to login
-      router.push("/login");
-    }
-  };
-
-  // Avoid hydration mismatch: render a stable placeholder until we know the state
-  if (!ready && !auth.currentUser) {
+  if (loading) {
     return (
-      <button type="button" className={className} disabled aria-disabled="true">
-        Login
+      <button className={btn} aria-busy="true" aria-label="Loading">
+        …
+      </button>
+    );
+  }
+
+  if (user) {
+    return (
+      <button
+        className={btn}
+        onClick={async () => {
+          try {
+            await signOut(auth);
+          } finally {
+            router.refresh(); // update header immediately
+          }
+        }}
+      >
+        Logout
       </button>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={className}
-      aria-label={user ? "Logout" : "Login"}
-    >
-      {user ? "Logout" : "Login"}
+    <button className={btn} onClick={() => router.push("/login")}>
+      Login
     </button>
   );
 }
