@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -28,7 +29,7 @@ const NAV = [
   { label: "Billing", href: "/creator-studio/billing" },
 ];
 
-/** --- Simple gold outline helper --- */
+/** --- Gold outline helper --- */
 const outline = {
   border: `2px solid ${GOLD}`,
   boxShadow: `0 0 0 1px rgba(255,215,0,0.5), inset 0 0 10px rgba(255,215,0,0.18)`,
@@ -55,7 +56,6 @@ export default function CreatorStudioLayout({
     return () => unsub();
   }, [router]);
 
-  // While checking auth, avoid flicker
   if (user === null) {
     return (
       <div
@@ -83,75 +83,51 @@ export default function CreatorStudioLayout({
         gap: 16,
       }}
     >
-      {/* Header (narrow, centered title, no Create button) */}
-      <header
+      {/* Header row */}
+      <div
         style={{
           gridColumn: "1 / -1",
-          position: "relative",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "10px 0",
+          position: "relative",
+          marginTop: 10,
         }}
       >
-        {/* dancing smiley – left (now inset from edge) */}
+        {/* dancing smiley – left */}
         <Smiley position="left" />
 
-        {/* centered title bar */}
-        <div
+        {/* Header bar (logo INSIDE now) */}
+        <header
           style={{
             ...outline,
             background: PANEL_BG,
-            padding: "8px 20px",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            maxWidth: 820, // keeps header narrow so emojis are visible
+            padding: "8px 14px",
+            maxWidth: 820,
             width: "92%",
-            justifyContent: "center",
+            display: "grid",
+            gridTemplateColumns: "auto 1fr auto", // logo | centered title | buttons
+            alignItems: "center",
+            columnGap: 14,
           }}
         >
-          {/* small square logo */}
-          <div
-            style={{
-              ...outline,
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: "#fff",
-              display: "grid",
-              placeItems: "center",
-              overflow: "hidden",
-            }}
-          >
-            {/* placeholder TV glyph */}
-            <div
+          {/* Inside logo (larger for visibility) */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Image
+              src="/logo.png"
+              alt="Integrity Streaming Logo"
+              width={86}
+              height={86}
               style={{
-                width: 22,
-                height: 16,
-                borderRadius: 4,
-                background:
-                  "linear-gradient(180deg, #B80E2A 0%, #8E0F22 100%)",
-                boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.85)",
-                position: "relative",
+                borderRadius: 10,
+                border: `2px solid ${GOLD}`,
+                boxShadow: `0 0 10px rgba(255,215,0,0.4)`,
+                background: "#ffffff",
               }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: 0,
-                  height: 0,
-                  borderTop: "5px solid transparent",
-                  borderBottom: "5px solid transparent",
-                  borderLeft: "8px solid white",
-                  transform: "translate(-35%, -50%)",
-                }}
-              />
-            </div>
+            />
           </div>
 
+          {/* Centered Title */}
           <h1
             style={{
               margin: 0,
@@ -167,8 +143,8 @@ export default function CreatorStudioLayout({
             Integrity Streaming&nbsp;Creator&nbsp;Studio
           </h1>
 
-          {/* right-side controls (Home + Logout same size) */}
-          <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+          {/* Right controls (equal size buttons) */}
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <HeaderBtn asLink href="/home" label="Home" />
             <HeaderBtn
               onClick={async () => {
@@ -178,11 +154,11 @@ export default function CreatorStudioLayout({
               label="Logout"
             />
           </div>
-        </div>
+        </header>
 
-        {/* dancing smiley – right (now inset from edge) */}
+        {/* dancing smiley – right */}
         <Smiley position="right" />
-      </header>
+      </div>
 
       {/* Left nav (vertical) */}
       <aside
@@ -231,7 +207,7 @@ export default function CreatorStudioLayout({
         {children}
       </main>
 
-      {/* global styles for smiley dance */}
+      {/* Global styles for smiley dance */}
       <style jsx global>{`
         @keyframes dance-bounce {
           0% { transform: translateY(0) rotate(0deg); }
@@ -324,7 +300,6 @@ export default function CreatorStudioLayout({
           50%     { transform: rotate(0deg) translateY(2px); }
         }
 
-        /* Hide dancing emojis on very small screens to avoid overlap */
         @media (max-width: 720px) {
           .studio-smiley { display: none; }
         }
@@ -371,12 +346,9 @@ function HeaderBtn({
   );
 }
 
-/** 
- * Dancing smiley positioned near the edges
- * CHANGE: inset from edges increased to add padding (was ~10px)
- */
+/** Dancing smiley positioned near edges */
 function Smiley({ position }: { position: "left" | "right" }) {
-  const inset = 28; // <-- increased padding from the side edges
+  const inset = 28;
   return (
     <div
       className="studio-smiley"

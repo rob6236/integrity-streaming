@@ -1,26 +1,23 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/useAuth"; // <-- named import
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/useAuth';
 
 const btn =
-  "px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all";
+  "px-5 py-2 rounded-md border-[1.5px] border-[--gold] bg-white text-black font-semibold shadow-sm hover:shadow transition";
 
 export default function CreateButton() {
-  const { user } = useAuth();
+  // If you have a loading state, you can use it, but we won’t block navigation
+  const { /* user, loading */ } = useAuth();
   const router = useRouter();
 
+  const go = () => {
+    // Let the /creator-studio page enforce auth (via RequireAuth)
+    router.push('/creator-studio');
+  };
+
   return (
-    <button
-      className={btn}
-      onClick={() => {
-        if (user) {
-          router.push("/studio"); // placeholder route until Studio exists
-        } else {
-          router.push("/login");
-        }
-      }}
-    >
+    <button className={btn} onClick={go}>
       Create
     </button>
   );
