@@ -1,18 +1,16 @@
 // app/layout.tsx
-import type { Metadata } from "next";
-import "./globals.css";
+import type { ReactNode } from "react";
+import SmileyOverlay from "./_components/SmileyOverlay"; // <-- uses the file you created
+import "./globals.css"; // keep if you already have global styles
 
-export const metadata: Metadata = {
-  title: "Integrity Streaming",
-  description: "Creator-first video platform.",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {/* Gold page frame around the viewport */}
-        <div className="page-frame" />
+        {/* Global smileys on every page */}
+        <SmileyOverlay />
+
+        {/* Your app content */}
         {children}
       </body>
     </html>

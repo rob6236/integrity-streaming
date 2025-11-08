@@ -1,230 +1,159 @@
-// app/creator-studio/thumbnail-designer/page.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, storage } from "@/lib/firebase";
-import { ref as storageRef, uploadString } from "firebase/storage";
+import { auth } from "@/lib/firebase";
 
-import ThumbnailCanvas from "./_components/ThumbnailCanvas";
-import TextOverlayControls from "./_components/TextOverlayControls";
-import ImageAssetsPanel from "./_components/ImageAssetsPanel";
-import ExportDownloadPanel from "./_components/ExportDownloadPanel";
-import AIThumbnailPrompt from "./_components/AIThumbnailPrompt";
-
-/* Force link/placeholder colors to white on this page */
+/* Force white link/placeholder text (theme helper) */
 function WhiteTextFix() {
   return (
     <style jsx global>{`
       a { color: #fff !important; }
       a:hover { opacity: 0.88; }
-      input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.45); }
-      select { color: #fff; background: rgba(0,0,0,0.4); }
-      option { color: #000; }
+      input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.4); }
     `}</style>
   );
 }
 
-export type Aspect = "16:9" | "9:16";
+/* ---------- Inline, guaranteed-valid client components ---------- */
 
+function TextOverlayControlsInline() {
+  const [text, setText] = useState("");
+  return (
+    <div className="rounded-2xl border border-yellow-400 p-3">
+      <h2 className="font-bold mb-2">Text Overlay</h2>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Your title text"
+        className="w-full rounded-xl bg-transparent border border-yellow-400 px-3 py-2 outline-none"
+      />
+      <p className="text-xs opacity-70 mt-2">Preview text: {text || "—"}</p>
+    </div>
+  );
+}
+
+function AIThumbnailPromptInline() {
+  const [prompt, setPrompt] = useState("");
+  return (
+    <div className="rounded-2xl border border-yellow-400 p-3">
+      <h2 className="font-bold mb-2">AI Prompt</h2>
+      <textarea
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Describe the thumbnail you want…"
+        className="w-full h-24 rounded-xl bg-transparent border border-yellow-400 px-3 py-2 outline-none"
+      />
+      <button
+        type="button"
+        className="mt-2 px-4 py-2 rounded-xl border border-yellow-400"
+        onClick={() => alert(`Pretend-generate: ${prompt || "(empty)"}`)}
+      >
+        Generate Idea
+      </button>
+    </div>
+  );
+}
+
+function ThumbnailCanvasInline() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = "#7B0F24";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = "#FFD700";
+    ctx.font = "24px sans-serif";
+    ctx.fillText("Thumbnail Canvas", 20, 40);
+  }, []);
+  return (
+    <canvas
+      ref={canvasRef}
+      width={960}
+      height={540}
+      className="w-full rounded-2xl border border-yellow-400"
+    />
+  );
+}
+
+function ImageAssetsPanelInline() {
+  return (
+    <div className="rounded-2xl border border-yellow-400 p-3">
+      <h2 className="font-bold mb-2">Image Assets</h2>
+      <p className="opacity-80 text-sm">Upload/select images here (placeholder).</p>
+    </div>
+  );
+}
+
+function ExportDownloadPanelInline() {
+  return (
+    <div className="rounded-2xl border border-yellow-400 p-3">
+      <h2 className="font-bold mb-2">Export</h2>
+      <button
+        type="button"
+        className="px-4 py-2 rounded-xl border border-yellow-400"
+        onClick={() => alert("Export placeholder")}
+      >
+        Download PNG
+      </button>
+    </div>
+  );
+}
+
+/* ------------------------- Page ------------------------- */
 export default function ThumbnailDesignerPage() {
   const router = useRouter();
-
-  // Auth gate
-  const [checking, setChecking] = useState(true);
-  const [uid, setUid] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      if (!u) {
-        router.replace("/login");
-      } else {
-        setUid(u.uid);
-        setUserEmail(u.email ?? null);
-        setChecking(false);
-      }
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (!user) router.replace("/login");
+      else setReady(true);
     });
     return () => unsub();
   }, [router]);
 
-  // Designer state
-  const [sourceUrl, setSourceUrl] = useState<string>("");
-  const [timeSec, setTimeSec] = useState<number>(0);
-  const [aspect, setAspect] = useState<Aspect>("16:9");
-
-  const [title, setTitle] = useState<string>("");
-  const [subtitle, setSubtitle] = useState<string>("");
-  const [titleSize, setTitleSize] = useState<number>(64);
-  const [subtitleSize, setSubtitleSize] = useState<number>(36);
-  const [stroke, setStroke] = useState<boolean>(true);
-
-  const [logoUrl, setLogoUrl] = useState<string>(""); // optional overlay image
-
-  const [captureDataUrl, setCaptureDataUrl] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [savedPath, setSavedPath] = useState<string | null>(null);
-  const [error, setError] = useState<string>("");
-
-  const canvasSize = useMemo(
-    () => (aspect === "16:9" ? { w: 1280, h: 720 } : { w: 1080, h: 1920 }),
-    [aspect]
-  );
-
-  function fail(msg: string) {
-    setError(msg);
+  if (!ready) {
+    return (
+      <>
+        <WhiteTextFix />
+        <div className="p-6 text-white">Loading…</div>
+      </>
+    );
   }
-
-  async function handleSaveToStorage() {
-    if (!uid) return;
-    if (!captureDataUrl) return fail("Capture a thumbnail first.");
-    try {
-      setSaving(true);
-      setSavedPath(null);
-      const path = `users/${uid}/thumbnails/${Date.now()}.png`;
-      const ref = storageRef(storage, path);
-      await uploadString(ref, captureDataUrl, "data_url");
-      setSavedPath(path);
-    } catch (e: any) {
-      fail(e?.message ?? "Save failed.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function handleDownloadPng() {
-    if (!captureDataUrl) return;
-    const a = document.createElement("a");
-    a.href = captureDataUrl;
-    a.download = `thumbnail-${aspect.replace(":", "x")}.png`;
-    a.click();
-  }
-
-  if (checking) return <div className="p-6 text-white/90">Checking your session…</div>;
 
   return (
     <>
       <WhiteTextFix />
-      <div className="p-6">
-        {/* Header */}
-        <div className="mb-5 grid grid-cols-3 items-center">
-          <div />
-          <h1 className="text-center text-2xl font-semibold text-white">Thumbnail Designer</h1>
-          <div className="text-right text-sm text-white/70">Signed in as {userEmail ?? "unknown"}</div>
-        </div>
-
-        <div className="rounded-2xl border border-[var(--gold,#FFD700)]/80 bg-black/15 p-0 shadow-[0_0_0_1px_rgba(255,215,0,0.4)]">
-          <div className="grid gap-6 p-5 md:grid-cols-[1.2fr,1fr] md:p-6">
-            {/* Left: Canvas + export */}
-            <div>
-              <div className="mb-3 grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block text-xs text-white/70">Aspect</label>
-                  <select
-                    value={aspect}
-                    onChange={(e) => setAspect(e.target.value as Aspect)}
-                    className="w-full rounded-md border border-white/15 bg-black/40 px-2 py-2 text-sm outline-none focus:border-[var(--gold,#FFD700)]/70"
-                  >
-                    <option value="16:9">16:9 (1280×720)</option>
-                    <option value="9:16">9:16 (1080×1920)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-white/70">Time (seconds)</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={timeSec}
-                    onChange={(e) => setTimeSec(Number(e.target.value || 0))}
-                    className="w-full rounded-md border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[var(--gold,#FFD700)]/70"
-                  />
-                </div>
-              </div>
-
-              <label className="mb-1 block text-xs text-white/70">Video URL (Firebase Storage)</label>
-              <input
-                value={sourceUrl}
-                onChange={(e) => setSourceUrl(e.target.value)}
-                placeholder="https://firebasestorage.googleapis.com/..."
-                className="mb-3 w-full rounded-md border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 focus:border-[var(--gold,#FFD700)]/70"
-              />
-
-              <ThumbnailCanvas
-                size={canvasSize}
-                aspect={aspect}
-                sourceUrl={sourceUrl}
-                timeSec={timeSec}
-                title={title}
-                subtitle={subtitle}
-                titleSize={titleSize}
-                subtitleSize={subtitleSize}
-                stroke={stroke}
-                logoUrl={logoUrl}
-                onCaptured={(url) => {
-                  setError("");
-                  setSavedPath(null);
-                  setCaptureDataUrl(url);
-                }}
-                onError={fail}
-              />
-
-              <ExportDownloadPanel
-                dataUrl={captureDataUrl}
-                saving={saving}
-                onDownload={handleDownloadPng}
-                onSave={handleSaveToStorage}
-                onOpenEditorHref="/creator-studio/editor"
-              />
-
-              {error && (
-                <div className="mt-3 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">
-                  {error}
-                </div>
-              )}
-              {savedPath && (
-                <div className="mt-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-                  Saved to: <span className="font-mono">{savedPath}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Right: Controls */}
-            <div className="space-y-4">
-              <TextOverlayControls
-                title={title}
-                subtitle={subtitle}
-                titleSize={titleSize}
-                subtitleSize={subtitleSize}
-                stroke={stroke}
-                onChange={({ title, subtitle, titleSize, subtitleSize, stroke }) => {
-                  if (title !== undefined) setTitle(title);
-                  if (subtitle !== undefined) setSubtitle(subtitle);
-                  if (titleSize !== undefined) setTitleSize(titleSize);
-                  if (subtitleSize !== undefined) setSubtitleSize(subtitleSize);
-                  if (stroke !== undefined) setStroke(stroke);
-                }}
-              />
-
-              <ImageAssetsPanel
-                logoUrl={logoUrl}
-                onLogoUrl={(u) => setLogoUrl(u)}
-              />
-
-              <AIThumbnailPrompt
-                onApplySuggestion={(suggestion) => {
-                  // Simple apply: fill title/subtitle from AI suggestion
-                  if (suggestion.title) setTitle(suggestion.title);
-                  if (suggestion.subtitle) setSubtitle(suggestion.subtitle);
-                }}
-              />
-            </div>
+      <div className="p-4 text-white">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold">Thumbnail Designer</h1>
+          <div className="flex gap-3">
+            <Link href="/creator-studio" className="px-4 py-2 rounded-xl border border-yellow-400">Back to Studio</Link>
+            <Link href="/" className="px-4 py-2 rounded-xl border border-yellow-400">Home</Link>
           </div>
         </div>
 
-        <div className="mt-4 text-center text-xs text-white/50">
-          Tip: Use high contrast and large faces. YouTube recommends 1280×720 for 16:9.
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-12 md:col-span-3 space-y-4">
+            <TextOverlayControlsInline />
+            <AIThumbnailPromptInline />
+          </div>
+
+          <div className="col-span-12 md:col-span-6">
+            <div className="rounded-2xl border border-yellow-400 p-2">
+              <ThumbnailCanvasInline />
+            </div>
+          </div>
+
+          <div className="col-span-12 md:col-span-3 space-y-4">
+            <ImageAssetsPanelInline />
+            <ExportDownloadPanelInline />
+          </div>
         </div>
       </div>
     </>

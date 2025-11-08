@@ -1,38 +1,50 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
-const gold = "#FFD700";
+type Item = { label: string; href: string };
+
+const items: Item[] = [
+  { label: "Dashboard",         href: "/creator-studio" },
+  { label: "Content Library",   href: "/creator-studio/library" },
+  { label: "Upload",            href: "/creator-studio/upload" },
+  { label: "Editor",            href: "/creator-studio/editor" },
+  // ✅ Corrected route
+  { label: "Thumbnail Designer", href: "/creator-studio/thumbnail-designer" },
+  { label: "Captions",          href: "/creator-studio/captions" },
+  { label: "Monetization",      href: "/creator-studio/monetization" },
+  { label: "Posts (Social)",    href: "/creator-studio/posts" },
+  { label: "Comments / Inbox",  href: "/creator-studio/inbox" },
+  { label: "Settings",          href: "/creator-studio/settings" },
+];
 
 export default function SidebarNav() {
+  const pathname = usePathname();
+
   return (
-    <aside className="w-60 p-3 flex flex-col gap-3">
-      <NavLink href="/creator-studio">Dashboard</NavLink>
-      <NavLink href="/creator-studio/content-library">Content Library</NavLink>
-      <NavLink href="/creator-studio/upload">Upload</NavLink>
-      <NavLink href="/creator-studio/editor">Editor</NavLink>
-      <NavLink href="/creator-studio/thumbnail-designer">Thumbnail Designer</NavLink>
-      <NavLink href="/creator-studio/captions">Captions</NavLink>
-      <NavLink href="/creator-studio/monetization">Monetization</NavLink>
-      <NavLink href="/creator-studio/posts">Posts (Social)</NavLink>
-
-      {/* ✅ Exact correct path */}
-      <NavLink href="/creator-studio/comments-inbox">Comments / Inbox</NavLink>
-
-      <NavLink href="/creator-studio/settings">Settings</NavLink>
-    </aside>
-  );
-}
-
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      prefetch={false}
-      className="rounded-xl px-4 py-3 text-center border hover:opacity-90 transition-all no-underline"
-      style={{ borderColor: "#FFD700", color: "#FFFFFF", textDecoration: "none" }}
-    >
-      {children}
-    </Link>
+    <nav className="w-full space-y-3">
+      {items.map((it) => {
+        const active = pathname === it.href;
+        return (
+          <Link
+            key={it.href}
+            href={it.href}
+            className={clsx(
+              "block rounded-2xl border px-4 py-3 text-[15px] font-semibold",
+              "transition-all",
+              // your burgundy/gold styling:
+              "border-[rgba(255,215,0,0.6)] bg-[rgba(0,0,0,0.18)] text-[rgba(255,255,255,0.92)]",
+              active
+                ? "shadow-[0_0_0_2px_rgba(255,215,0,0.6)]"
+                : "hover:shadow-[0_0_0_2px_rgba(255,215,0,0.35)]"
+            )}
+          >
+            {it.label}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

@@ -11,13 +11,29 @@ type Props = {
 export default function DancingSmiley({ size = 44, side = "left", className }: Props) {
   const flip = side === "right" ? 1 : -1;
 
+  // Brand colors
+  const burgundy = "#7B0F24";
+  const gold = "#FFD700";
+  const black = "#000000";
+  const dark = "#272424";
+
+  // Hand / shoe sizes (scale a bit with icon size)
+  const handR = Math.max(3.5, size * 0.06);
+  const shoeR = Math.max(4.5, size * 0.07);
+
+  // Limb endpoints (used for hands/shoes)
+  const leftHand = { x: 22, y: 34 };
+  const rightHand = { x: 78, y: 34 };
+  const leftShoe = { x: 42 - 12 * flip, y: 92 };
+  const rightShoe = { x: 58 + 12 * flip, y: 92 };
+
   return (
     <div
       className={className}
       style={{
         position: "absolute",
-        top: -6,                               // float slightly outside the header
-        [side]: -6,                            // left:-6 or right:-6
+        top: -6,
+        [side]: -6,
         width: size,
         height: size,
         pointerEvents: "none",
@@ -39,59 +55,66 @@ export default function DancingSmiley({ size = 44, side = "left", className }: P
             <stop offset="100%" stopColor="#FFB22E" />
           </radialGradient>
         </defs>
-        <circle cx="50" cy="50" r="42" fill="url(#dsFace)" stroke="#7B0F24" strokeWidth="2.5" />
+
+        <circle cx="50" cy="50" r="42" fill="url(#dsFace)" stroke={burgundy} strokeWidth="2.5" />
 
         {/* eyes */}
-        <circle cx="36" cy="42" r="4.8" fill="#272424" />
-        <circle cx="64" cy="42" r="4.8" fill="#272424" />
+        <circle cx="36" cy="42" r="4.8" fill={dark} />
+        <circle cx="64" cy="42" r="4.8" fill={dark} />
 
-        {/* smile */}
+        {/* smile (gold with subtle dark outline) */}
         <path
           d="M30,58 C40,72 60,72 70,58"
           fill="none"
-          stroke="#272424"
+          stroke={dark}
+          strokeWidth="7"
+          strokeLinecap="round"
+          style={{ animation: "ds-smile 1.8s ease-in-out infinite" }}
+        />
+        <path
+          d="M30,58 C40,72 60,72 70,58"
+          fill="none"
+          stroke={gold}
           strokeWidth="5"
           strokeLinecap="round"
           style={{ animation: "ds-smile 1.8s ease-in-out infinite" }}
         />
 
-        {/* arms (group for wiggle) */}
+        {/* ARMS: black limbs, gold hands */}
         <g
           style={{
             transformOrigin: "50px 50px",
             animation: "ds-arms 1.8s ease-in-out infinite",
           }}
-          stroke="#7B0F24"
-          strokeWidth="6"
+          fill="none"
           strokeLinecap="round"
         >
-          {/* left arm */}
-          <path
-            d={`M 12 50 Q 8 ${30 + 5 * flip} 22 34`}
-            fill="none"
-          />
-          {/* right arm */}
-          <path
-            d={`M 88 50 Q 92 ${30 - 5 * flip} 78 34`}
-            fill="none"
-          />
+          {/* left arm (black) */}
+          <path d={`M 12 50 Q 8 ${30 + 5 * flip} 22 34`} stroke={black} strokeWidth="6.5" />
+          {/* right arm (black) */}
+          <path d={`M 88 50 Q 92 ${30 - 5 * flip} 78 34`} stroke={black} strokeWidth="6.5" />
         </g>
+        {/* hands (gold circles with dark outline) */}
+        <circle cx={leftHand.x}  cy={leftHand.y}  r={handR} fill={gold} stroke={dark} strokeWidth="1.5" />
+        <circle cx={rightHand.x} cy={rightHand.y} r={handR} fill={gold} stroke={dark} strokeWidth="1.5" />
 
-        {/* legs (little step) */}
+        {/* LEGS: black limbs, gold shoes */}
         <g
           style={{
             transformOrigin: "50px 72px",
             animation: "ds-legs 1.8s ease-in-out infinite",
           }}
-          stroke="#7B0F24"
-          strokeWidth="6"
+          fill="none"
           strokeLinecap="round"
         >
-          {/* left leg */}
-          <path d={`M 42 78 L ${42 - 12 * flip} 92`} />
-          {/* right leg */}
-          <path d={`M 58 78 L ${58 + 12 * flip} 92`} />
+          {/* left leg (black) */}
+          <path d={`M 42 78 L ${leftShoe.x} ${leftShoe.y}`} stroke={black} strokeWidth="7" />
+          {/* right leg (black) */}
+          <path d={`M 58 78 L ${rightShoe.x} ${rightShoe.y}`} stroke={black} strokeWidth="7" />
         </g>
+        {/* shoes (gold circles with dark outline) */}
+        <circle cx={leftShoe.x}  cy={leftShoe.y}  r={shoeR} fill={gold} stroke={dark} strokeWidth="1.8" />
+        <circle cx={rightShoe.x} cy={rightShoe.y} r={shoeR} fill={gold} stroke={dark} strokeWidth="1.8" />
       </svg>
 
       <style jsx>{`
