@@ -1,10 +1,8 @@
 "use client";
-
 import { useState } from "react";
 
 export default function AIThumbnailPrompt() {
   const [prompt, setPrompt] = useState("");
-
   return (
     <div className="rounded-2xl border border-yellow-400 p-3">
       <h2 className="font-bold mb-2">AI Prompt</h2>

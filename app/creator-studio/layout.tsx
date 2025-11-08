@@ -138,7 +138,7 @@ export default function CreatorStudioLayout({ children }: { children: React.Reac
 
           {/* Right controls */}
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-            <HeaderBtn asLink href="/" label="Home" />
+            <HeaderBtn asLink href="/home" label="Home" />
             <HeaderBtn
               onClick={async () => {
                 await signOut(auth);
