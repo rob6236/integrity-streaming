@@ -1,25 +1,23 @@
-// app/lib/firebase.ts
+// lib/firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// --- Your Firebase config (Integrity Streaming) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBP3UUhArTXN-vZhNxWYnNPtAJGyXNy0YI",
-  authDomain: "integrity-streaming-4c27a.firebaseapp.com",
-  projectId: "integrity-streaming-4c27a",
-  storageBucket: "integrity-streaming-4c27a.firebasestorage.app",
-  messagingSenderId: "58399697022",
-  appId: "1:58399697022:web:6e21b545f1a69aeb73502f",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET, // integrity-streaming.appspot.com
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Make sure we don't reinitialize on hot reloads
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Email/Password only (no Google provider exported)
 export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+
+// 🔒 Pin the exact bucket to avoid accidental “-xxxx” buckets
+const forcedBucket = `gs://${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}`;
+export const storage = getStorage(app, forcedBucket);
 
 export default app;

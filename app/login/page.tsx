@@ -1,87 +1,83 @@
-// C:\Users\rcwoo\integrity-streaming\app\login\page.tsx
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [err, setErr] = useState<string>("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setErr("");
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/home");
-    } catch (err: any) {
-      setError("Invalid email or password");
+      const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
+      console.log("Logged in as:", cred.user.uid);
+      router.push("/creator-studio/upload"); // or /home if you prefer
+    } catch (e: any) {
+      console.error("Login error:", e?.code, e?.message);
+      // Show the exact Firebase error code so we know what's wrong
+      setErr(e?.code || "auth/unknown-error");
     }
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#7B0F24] text-white border-2 border-[#FFD700]">
-      <div
-        className="w-full max-w-md rounded-2xl border-2 border-[#FFD700] bg-[#7B0F24]"
-        style={{ paddingLeft: "1in", paddingRight: "1in" }} // <-- Added 1 inch padding on left and right
-      >
-        <h1 className="text-3xl font-bold text-[#FFD700] mb-6">Log in</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "#7B0F24" }}>
+      <div className="w-full max-w-xl border-4" style={{ borderColor: "#FFD700", borderRadius: 16, padding: 24 }}>
+        <h1 className="text-3xl font-bold mb-6" style={{ color: "#FFD700" }}>Log in</h1>
+
+        <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block font-semibold mb-1">
-              Email
-            </label>
+            <label className="block mb-1" style={{ color: "#FFD700" }}>Email</label>
             <input
-              type="email"
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
+              className="w-full p-2 rounded"
+              style={{ background: "#fff" }}
+              type="email"
               placeholder="you@example.com"
-              className="w-full rounded-md border border-[#FFD700] p-2 text-black"
+              required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block font-semibold mb-1">
-              Password
-            </label>
+            <label className="block mb-1" style={{ color: "#FFD700" }}>Password</label>
             <input
-              type="password"
-              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 rounded"
+              style={{ background: "#fff" }}
+              type="password"
+              placeholder="••••••••"
               required
-              className="w-full rounded-md border border-[#FFD700] p-2 text-black"
             />
           </div>
 
-          {error && (
-            <p className="text-red-400 text-sm font-semibold">{error}</p>
+          {err && (
+            <p className="mt-2" style={{ color: "#FFD700", background: "rgba(0,0,0,0.3)", padding: 8, borderRadius: 8 }}>
+              {err}
+            </p>
           )}
 
           <button
             type="submit"
-            className="w-full rounded-md border-2 border-[#FFD700] bg-white text-black font-bold py-2 hover:bg-gray-100"
+            className="w-full font-semibold py-2 rounded"
+            style={{ background: "#FFD700", color: "#000" }}
           >
             Login
           </button>
         </form>
 
-        <div className="flex justify-between text-sm mt-4">
-          <Link href="/signup" className="text-[#FFD700] font-semibold">
-            Create an account
-          </Link>
-          <Link href="/forgot-password" className="text-[#FFD700] font-semibold">
-            Forgot password?
-          </Link>
+        <div className="mt-4 flex justify-between">
+          <a href="/signup" style={{ color: "#FFD700", textDecoration: "underline" }}>Create an account</a>
+          <a href="/forgot-password" style={{ color: "#FFD700", textDecoration: "underline" }}>Forgot password?</a>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
