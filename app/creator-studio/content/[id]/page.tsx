@@ -1,141 +1,168 @@
-// app/creator-studio/content/[id]/page.tsx
-"use client";
-
-import React, { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+// Server component so params/searchParams work directly (no "use client")
+import React from "react";
 import Link from "next/link";
 
-type VideoItem = {
-  id: string;
-  title: string;
-  views?: string;
-  uploaded?: string;
-};
+const GOLD = "#FFD700";
 
-const MOCK_DB: Record<string, VideoItem> = {
-  v1: { id: "v1", title: "Video Title", views: "12K views", uploaded: "6 days ago" },
-  v2: { id: "v2", title: "Video Title", views: "12K views", uploaded: "6 days ago" },
-  s1: { id: "s1", title: "Shorts Title", views: "12K views", uploaded: "5 days ago" },
-  // extend as needed
-};
+export default function ContentDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: { kind?: string };
+}) {
+  const { id } = params;
+  const kind = (searchParams?.kind ?? "video").toLowerCase();
+  const isShort = kind === "short";
 
-export default function VideoDetailPage({ params }: { params: { id: string } }) {
-  // Next 14+ passes params via server props in app router. But for client interactions we keep it simple.
-  const id = params?.id ?? "v1"; // fallback
-  const video = MOCK_DB[id] ?? { id, title: "Unknown video" };
-  const [showEmbed, setShowEmbed] = useState(false);
-  const [showShare, setShowShare] = useState(false);
-  const [deleted, setDeleted] = useState(false);
-
-  function onEdit() {
-    // TODO: navigate to editor for this video
-    alert("Edit — open editor for " + id);
-  }
-  function onShare() {
-    setShowShare(true);
-  }
-  function onEmbed() {
-    setShowEmbed(true);
-  }
-  function onAnalytics() {
-    alert("Analytics — open analytics panel for " + id);
-  }
-  function onDelete() {
-    if (!confirm("Delete this video? This is irreversible in mock mode.")) return;
-    setDeleted(true);
-  }
-
-  if (deleted) {
-    return (
-      <div className="min-h-screen bg-burgundy text-white p-12">
-        <div className="max-w-4xl mx-auto border-2 border-gold p-8 rounded-lg">
-          <h2 className="text-2xl font-bold">Deleted</h2>
-          <p className="mt-4">The video has been deleted (mock mode).</p>
-          <Link href="/creator-studio/content-library" className="mt-6 inline-block px-4 py-2 border-2 border-gold">Back to library</Link>
-        </div>
-      </div>
-    );
-  }
+  // Dynamic pieces
+  const aspect = isShort ? "9 / 16" : "16 / 9";
+  const displayTitle = isShort ? "Shorts Title" : "Video Title";
+  const wrapClass = isShort ? "playerWrap short" : "playerWrap video";
 
   return (
-    <div className="min-h-screen bg-burgundy text-white p-6">
+    <div>
       <style>{`
-        .bg-burgundy { background: #7B0F24; }
-        .border-gold { border-color: #FFD700; }
+        /* ---------- Page shell: center the content ---------- */
+        .shell {
+          width: 100%;
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 0 16px;
+        }
+
+        .title {
+          color: ${GOLD};
+          font-weight: 900;
+          font-style: italic;
+          font-size: 40px;
+          line-height: 1.1;
+          text-align: center;
+          text-shadow:
+            1px 1px 0 #4a0b16,
+            2px 2px 0 #4a0b16,
+            3px 3px 0 rgba(0,0,0,0.55);
+          margin: 8px 0 16px 0;
+        }
+
+        /* ---------- Frame that holds player + buttons ---------- */
+        .frame {
+          border: 3px solid ${GOLD};
+          border-radius: 16px;
+          background: rgba(0,0,0,0.18);
+          padding: 14px;
+        }
+
+        /* ---------- Player width caps (compact) ---------- */
+        .playerWrap {
+          width: 100%;
+          margin: 0 auto;
+        }
+        .playerWrap.video { max-width: 720px; }
+        .playerWrap.short { max-width: 300px; }
+
+        .player {
+          border: 3px solid ${GOLD};
+          border-radius: 12px;
+          background: rgba(0,0,0,0.25);
+          width: 100%;
+          aspect-ratio: ${aspect};
+          display: grid;
+          place-items: center;
+        }
+
+        .metaTitle {
+          margin: 14px auto 12px auto;
+          color: #fff;
+          font-size: 20px;
+          font-weight: 800;
+          text-align: left;
+          max-width: 720px;
+        }
+        .metaTitle.short { max-width: 300px; }
+
+        /* ---------- ACTION BAR ---------- */
+        .bar {
+          display: grid;
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 12px;
+          max-width: 720px;
+          margin: 0 auto;
+        }
+        /* For shorts: only 2 columns so labels have room */
+        .bar.short {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+          max-width: 300px;
+        }
+
+        @media (max-width: 900px) {
+          .bar { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+          .bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        .btn {
+          border: 3px solid ${GOLD};
+          border-radius: 14px;
+          background: rgba(0,0,0,0.25);
+          color: #fff;
+          font-weight: 800;
+          font-size: 15px;
+          line-height: 1.1;
+          padding: 12px 14px;
+          text-align: center;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 46px;        /* consistent button height */
+          white-space: nowrap;     /* keep labels on one line */
+          overflow: hidden;
+          text-overflow: ellipsis; /* protect tiny widths */
+        }
       `}</style>
 
-      <div className="max-w-5xl mx-auto">
-        <header className="rounded-lg border-2 border-gold p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white rounded p-1">
-                <div className="w-full h-full bg-burgundy flex items-center justify-center text-white">logo</div>
-              </div>
-              <div className="text-gold text-2xl font-bold text-center">Integrity Streaming Creator Studio</div>
-            </div>
-            <div className="flex gap-3">
-              <Link href="/home" className="px-4 py-2 border-2 border-gold rounded">Home</Link>
-              <button className="px-4 py-2 border-2 border-gold rounded">Logout</button>
+      <div className="shell">
+        <h1 className="title">{displayTitle}</h1>
+
+        <div className="frame">
+          {/* Player */}
+          <div className={wrapClass}>
+            <div className="player" aria-label={`${displayTitle} player`}>
+              <div
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderLeft: "22px solid #fff",
+                  borderTop: "16px solid transparent",
+                  borderBottom: "16px solid transparent",
+                  filter:
+                    "drop-shadow(0 1px 0 rgba(0,0,0,0.25)) drop-shadow(0 0 1px rgba(0,0,0,0.25))",
+                }}
+                aria-hidden
+              />
             </div>
           </div>
-        </header>
 
-        <h1 className="text-center text-5xl text-gold font-extrabold mb-6">{video.title}</h1>
+          <h2 className={`metaTitle ${isShort ? "short" : ""}`}>
+            {displayTitle} (id: {id})
+          </h2>
 
-        <div className="rounded-lg border-2 border-gold p-6 bg-burgundy-dark">
-          {/* player mock */}
-          <div className="w-full aspect-video bg-burgundy-darker rounded-md mb-6 flex items-center justify-center">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"></path></svg>
+          <div className={`bar ${isShort ? "short" : ""}`}>
+            <Link className="btn" href={`/creator-studio/editor?from=${id}`}>
+              Edit
+            </Link>
+            <button className="btn">Share</button>
+            <button className="btn">Embed</button>
+            <Link className="btn" href={`/creator-studio/analytics?content=${id}`}>
+              Analytics
+            </Link>
+            <button className="btn">Delete</button>
+            <Link className="btn" href="/creator-studio/library">
+              Done
+            </Link>
           </div>
-
-          <div className="text-2xl font-semibold mb-4">{video.title}</div>
-
-          <div className="flex gap-4 flex-wrap">
-            <button onClick={onEdit} className="px-6 py-4 rounded-md border-2 border-gold flex items-center gap-3">
-              <span>✏️</span> Edit
-            </button>
-
-            <button onClick={onShare} className="px-6 py-4 rounded-md border-2 border-gold flex items-center gap-3">
-              <span>🔁</span> Share
-            </button>
-
-            <button onClick={onEmbed} className="px-6 py-4 rounded-md border-2 border-gold flex items-center gap-3">
-              <span>{"</>"}</span> Embed
-            </button>
-
-            <button onClick={onAnalytics} className="px-6 py-4 rounded-md border-2 border-gold flex items-center gap-3">
-              <span>📊</span> Analytics
-            </button>
-
-            <button onClick={onDelete} className="px-6 py-4 rounded-md border-2 border-gold flex items-center gap-3">
-              <span>🗑️</span> Delete
-            </button>
-          </div>
-
-          {/* Embed modal */}
-          {showEmbed && (
-            <div className="mt-6 bg-black/60 p-4 rounded">
-              <div className="text-white">Embed code (mock):</div>
-              <pre className="bg-[#2b0f12] p-3 rounded mt-2 text-sm">
-{`<iframe src="https://integritystreaming.com/embed/${video.id}" width="560" height="315"></iframe>`}
-              </pre>
-              <div className="mt-2">
-                <button onClick={() => setShowEmbed(false)} className="px-3 py-2 border-2 border-gold">Close</button>
-              </div>
-            </div>
-          )}
-
-          {/* Share modal */}
-          {showShare && (
-            <div className="mt-6 bg-black/60 p-4 rounded">
-              <div>Share URL:</div>
-              <div className="mt-2 text-gold">{`https://integritystreaming.com/watch/${video.id}`}</div>
-              <div className="mt-3 flex gap-3">
-                <button onClick={() => { navigator.clipboard?.writeText(`https://integritystreaming.com/watch/${video.id}`); alert("Copied"); }} className="px-3 py-2 border-2 border-gold">Copy</button>
-                <button onClick={() => setShowShare(false)} className="px-3 py-2 border-2 border-gold">Close</button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

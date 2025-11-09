@@ -1,238 +1,206 @@
-// app/creator-studio/layout.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { usePathname } from "next/navigation";
 
-/** --- Theme --- */
 const BURGUNDY = "#7B0F24";
 const GOLD = "#FFD700";
-const CARD_BG = "rgba(0,0,0,0.18)";
-const PANEL_BG = "rgba(0,0,0,0.28)";
+const PANEL_BG = "rgba(0,0,0,0.22)";
+const OUTLINE = `0 0 0 3px ${GOLD}`;
 
-/** --- Nav items (left column) --- */
-const NAV = [
-  { label: "Dashboard",          href: "/creator-studio" },
-  { label: "Content Library",    href: "/creator-studio/library" },
-  { label: "Upload",             href: "/creator-studio/upload" },
-  { label: "Editor",             href: "/creator-studio/editor" },
-  // ✅ corrected route
-  { label: "Thumbnail Designer", href: "/creator-studio/thumbnail-designer" },
-  { label: "Captions",           href: "/creator-studio/captions" },
-  { label: "Monetization",       href: "/creator-studio/monetization" },
-  { label: "Posts (Social)",     href: "/creator-studio/posts" },
-  { label: "Comments / Inbox",   href: "/creator-studio/inbox" },
-  { label: "Settings",           href: "/creator-studio/settings" },
-  { label: "Billing",            href: "/creator-studio/billing" },
-];
-
-/** --- Gold outline helper --- */
-const outline: React.CSSProperties = {
-  border: `2px solid ${GOLD}`,
-  boxShadow: `0 0 0 1px rgba(255,215,0,0.5), inset 0 0 10px rgba(255,215,0,0.18)`,
-  borderRadius: 14,
-};
-
-export default function CreatorStudioLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
+export default function CreatorStudioLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
 
-  // Auth gate
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      if (!u) router.replace(`/login?next=${encodeURIComponent("/creator-studio")}`);
-    });
-    return () => unsub();
-  }, [router]);
+  const isActive = (href: string) =>
+    pathname === href || pathname?.startsWith(href + "/");
 
-  if (user === null) {
-    return (
-      <div
-        style={{
-          background: BURGUNDY,
-          color: "white",
-          minHeight: "100vh",
-          display: "grid",
-          placeItems: "center",
-        }}
-      >
-        <div style={{ ...outline, padding: 20 }}>Loading Studio…</div>
-      </div>
-    );
-  }
+  const navClass = (href: string) =>
+    `navBtn${isActive(href) ? " active" : ""}`;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: BURGUNDY,
-        color: "white",
-        display: "grid",
-        gridTemplateColumns: "260px 1fr",
-        gap: 16,
-      }}
-    >
-      {/* Header row (no local smileys) */}
-      <div
-        style={{
-          gridColumn: "1 / -1",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "relative",
-          marginTop: 10,
-        }}
-      >
-        <header
-          data-header="true"
-          style={{
-            ...outline,
-            background: PANEL_BG,
-            padding: "8px 14px",
-            maxWidth: 820,
-            width: "92%",
-            display: "grid",
-            gridTemplateColumns: "auto 1fr auto", // logo | centered title | buttons
-            alignItems: "center",
-            columnGap: 14,
-            overflow: "visible",
-          }}
-        >
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center" }}>
+    <div>
+      <style>{`
+        :root{
+          --logo-box: 116px;
+          --logo-inset: 6px;
+          --logo-radius: 18px;
+          --nav-col: 220px;
+        }
+
+        html, body, #__next { background:${BURGUNDY}; color:#fff; }
+        a { text-decoration:none; }
+
+        .gold-outline { box-shadow:${OUTLINE}; border-radius:16px; }
+        .gold-btn {
+          box-shadow:${OUTLINE};
+          background:${PANEL_BG};
+          border-radius:14px;
+          padding:8px 18px;
+          color:#fff;
+          font-weight:800;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+        }
+
+        /* HEADER */
+        .header-wrap{
+          width:100%;
+          display:grid;
+          place-items:center;
+          padding:16px 12px 20px;
+        }
+        .header{
+          max-width:1100px;
+          width:100%;
+          display:grid;
+          grid-template-columns:auto 1fr auto;
+          align-items:center;
+          gap:16px;
+          background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.12));
+          border-radius:18px;
+          padding:12px 16px;
+        }
+
+        .logoBox{
+          width:var(--logo-box);
+          height:var(--logo-box);
+          border-radius:var(--logo-radius);
+          background:#fff;
+          display:grid;
+          place-items:center;
+          box-shadow:0 0 0 4px ${GOLD} inset, 0 0 0 3px ${GOLD};
+          padding:var(--logo-inset);
+        }
+        .logoImg{
+          width:100%;
+          height:100%;
+          object-fit:contain;
+          border-radius:10px;
+          display:block;
+        }
+
+        .title{
+          justify-self:center;
+          text-align:center;
+          line-height:1.06;
+          font-style:italic;
+          font-weight:900;
+          color:${GOLD};
+          text-shadow:2px 2px 0 #4a0b16, 3px 3px 0 rgba(0,0,0,0.55);
+          margin:0 8px;
+        }
+        .title .top{ font-size:30px; }
+        .title .bottom{ font-size:26px; }
+
+        .header-actions{
+          display:flex;
+          align-items:center;
+          gap:12px;
+        }
+
+        /* PAGE GRID */
+        .page{
+          max-width:1200px;
+          margin:0 auto;
+          padding:0 16px 40px;
+          display:grid;
+          grid-template-columns:var(--nav-col) 1fr;
+          gap:20px;
+        }
+
+        /* SIDENAV */
+        .sidenav{
+          width:var(--nav-col);
+          display:flex;
+          flex-direction:column;
+          gap:12px;  /* increased spacing between buttons */
+          position:sticky;
+          top:18px;
+          height:fit-content;
+        }
+
+        .navBtn{
+          display:block;
+          width:100%;
+          text-align:left;
+          padding:8px 12px;
+          border-radius:12px;
+          background:${GOLD};
+          color:#000;
+          font-weight:900;
+          font-size:15px;
+          line-height:1.15;
+          box-shadow:${OUTLINE};
+          transition:filter .15s ease, transform .02s ease, background .15s ease;
+        }
+
+        .navBtn:hover{ filter:brightness(0.97); }
+        .navBtn:active{ transform:translateY(1px); }
+        .navBtn.active{
+          background:#fff;
+          color:#000;
+        }
+
+        @media (max-width:980px){
+          .page{ grid-template-columns:1fr; }
+          .sidenav{ width:100%; position:static; }
+          .title .top{ font-size:26px; }
+          .title .bottom{ font-size:22px; }
+          :root{ --logo-box: 104px; }
+        }
+      `}</style>
+
+      {/* HEADER */}
+      <div className="header-wrap">
+        <div className="header gold-outline">
+          <div className="logoBox">
             <Image
               src="/logo.png"
-              alt="Integrity Streaming Logo"
-              width={86}
-              height={86}
-              style={{
-                borderRadius: 10,
-                border: `2px solid ${GOLD}`,
-                boxShadow: `0 0 10px rgba(255,215,0,0.4)`,
-                background: "#ffffff",
-              }}
+              alt="Integrity Streaming"
+              width={220}
+              height={220}
+              className="logoImg"
+              priority
             />
           </div>
 
-          {/* Title */}
-          <h1
-            style={{
-              margin: 0,
-              fontWeight: 800,
-              letterSpacing: 0.4,
-              textShadow: "0 1px 0 rgba(0,0,0,0.45), 0 0 10px rgba(255,215,0,0.28)",
-              color: GOLD,
-              fontSize: 28,
-              textAlign: "center",
-              lineHeight: 1.05,
-            }}
-          >
-            Integrity Streaming&nbsp;Creator&nbsp;Studio
-          </h1>
-
-          {/* Right controls */}
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-            <HeaderBtn asLink href="/home" label="Home" />
-            <HeaderBtn
-              onClick={async () => {
-                await signOut(auth);
-                router.replace("/login");
-              }}
-              label="Logout"
-            />
+          <div className="title">
+            <div className="top">Integrity Streaming</div>
+            <div className="bottom">Creator Studio</div>
           </div>
-        </header>
+
+          <div className="header-actions">
+            <Link href="/home" className="gold-btn">Home</Link>
+            <Link href="/logout" className="gold-btn">Logout</Link>
+          </div>
+        </div>
       </div>
 
-      {/* Left nav */}
-      <aside
-        style={{
-          marginLeft: 12,
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-        }}
-      >
-        {NAV.map((item) => {
-          const active =
-            item.href === "/creator-studio"
-              ? pathname === "/creator-studio"
-              : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              style={{
-                ...outline,
-                background: active ? PANEL_BG : CARD_BG,
-                padding: "12px 14px",
-                color: "white",
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
-      </aside>
+      {/* MAIN */}
+      <div className="page">
+        <nav className="sidenav">
+          <Link href="/creator-studio/dashboard" className={navClass("/creator-studio/dashboard")}>Dashboard</Link>
+          <Link href="/creator-studio/library" className={navClass("/creator-studio/library")}>Content Library</Link>
+          <Link href="/creator-studio/upload" className={navClass("/creator-studio/upload")}>Upload</Link>
+          <Link href="/creator-studio/editor" className={navClass("/creator-studio/editor")}>Editor</Link>
+          <Link href="/creator-studio/thumbnail-designer" className={navClass("/creator-studio/thumbnail-designer")}>Thumbnail Designer</Link>
+          <Link href="/creator-studio/captions" className={navClass("/creator-studio/captions")}>Captions</Link>
+          <Link href="/creator-studio/monetization" className={navClass("/creator-studio/monetization")}>Monetization</Link>
+          <Link href="/creator-studio/posts" className={navClass("/creator-studio/posts")}>Posts (Social)</Link>
+          <Link href="/creator-studio/comments-inbox" className={navClass("/creator-studio/comments-inbox")}>Comments / Inbox</Link>
+          <Link href="/creator-studio/settings" className={navClass("/creator-studio/settings")}>Settings</Link>
+          <Link href="/creator-studio/billing" className={navClass("/creator-studio/billing")}>Billing</Link>
+        </nav>
 
-      {/* Content */}
-      <main
-        style={{
-          marginRight: 12,
-          marginTop: 8,
-          ...outline,
-          background: "transparent",
-          padding: 12,
-        }}
-      >
-        {children}
-      </main>
+        <main>{children}</main>
+      </div>
     </div>
-  );
-}
-
-/** === Small button component === */
-function HeaderBtn({
-  label,
-  onClick,
-  asLink,
-  href,
-}: {
-  label: string;
-  onClick?: () => void;
-  asLink?: boolean;
-  href?: string;
-}) {
-  const base: React.CSSProperties = {
-    ...outline,
-    background: CARD_BG,
-    padding: "10px 16px",
-    minWidth: 92,
-    textAlign: "center",
-    fontWeight: 700,
-    color: "white",
-    textDecoration: "none",
-    display: "inline-block",
-  };
-  if (asLink && href) {
-    return (
-      <Link href={href} style={base}>
-        {label}
-      </Link>
-    );
-  }
-  return (
-    <button style={{ ...base, cursor: "pointer" }} onClick={onClick}>
-      {label}
-    </button>
   );
 }

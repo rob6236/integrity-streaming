@@ -1,101 +1,74 @@
-﻿// app/creator-studio/library/page.tsx
-"use client";
+﻿"use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { auth } from "@/lib/firebase";
+import React from "react";
+import ContentCard, { ContentCardProps } from "./ContentCard";
 
-/* ---- Tiny placeholder card ---- */
-function PlaceholderCard({ kind }: { kind: "video" | "short" }) {
-  const ratioStyle = kind === "short" ? { paddingTop: "177.78%" } : { paddingTop: "56.25%" }; // 9:16 vs 16:9
-  return (
-    <div className="w-[160px] shrink-0">
-      <div
-        className="relative overflow-hidden rounded-lg border border-[var(--gold,#FFD700)]/55 bg-black/25"
-        style={ratioStyle}
-      >
-        <div className="absolute inset-0">
-          <div className="h-full w-full animate-pulse bg-gradient-to-br from-white/10 via-white/5 to-white/10" />
-        </div>
-        <div className="absolute bottom-2 right-2 rounded-full border border-black/40 bg-black/65 px-2 py-[2px] text-[10px] font-semibold text-white">
-          {kind === "short" ? "0:15" : "0:42"}
-        </div>
-      </div>
-      <div className="mt-2 h-3.5 w-[90%] rounded bg-white/30" />
-      <div className="mt-1 h-3 w-[65%] rounded bg-white/20" />
-    </div>
-  );
-}
+const GOLD = "#FFD700";
 
-/* ---- Row with title + scroller ---- */
-function RowSection({
-  title,
-  kind,
-  count = 12,
-}: {
-  title: string;
-  kind: "video" | "short";
-  count?: number;
-}) {
-  return (
-    <section className="mx-auto mb-8 w-full max-w-[1200px]">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-[15px] font-semibold text-white">{title}</h2>
-        <Link
-          href="/creator-studio/upload"
-          className="rounded-full border border-[var(--gold,#FFD700)] bg-[var(--gold,#FFD700)] px-3 py-1 text-xs font-semibold text-[#7B0F24] hover:brightness-95"
-        >
-          Upload
-        </Link>
-      </div>
+/** Mock data to visualize layout; swap for Firestore later */
+const videos: ContentCardProps[] = [
+  { id: "v1", title: "Video Title",  viewsLabel: "1.2K views", whenLabel: "6 days ago", kind: "video", href: "/creator-studio/content/v1?kind=video" },
+  { id: "v2", title: "Video Title",  viewsLabel: "1.2K views", whenLabel: "6 days ago", kind: "video", href: "/creator-studio/content/v2?kind=video" },
+  { id: "v3", title: "Video Title",  viewsLabel: "1.2K views", whenLabel: "6 days ago", kind: "video", href: "/creator-studio/content/v3?kind=video" },
+  { id: "v4", title: "Video Title",  viewsLabel: "1.2K views", whenLabel: "6 days ago", kind: "video", href: "/creator-studio/content/v4?kind=video" },
+  { id: "v5", title: "Video Title",  viewsLabel: "1.2K views", whenLabel: "6 days ago", kind: "video", href: "/creator-studio/content/v5?kind=video" },
+];
 
-      <div className="rounded-xl border border-[var(--gold,#FFD700)]/70 bg-black/20 p-3">
-        <div className="flex snap-x gap-3 overflow-x-auto pb-1">
-          {Array.from({ length: count }).map((_, i) => (
-            <div key={i} className="snap-start">
-              <PlaceholderCard kind={kind} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+const shorts: ContentCardProps[] = [
+  { id: "s1", title: "Shorts Title", viewsLabel: "12K views", whenLabel: "3 days ago", kind: "short", href: "/creator-studio/content/s1?kind=short" },
+  { id: "s2", title: "Shorts Title", viewsLabel: "12K views", whenLabel: "3 days ago", kind: "short", href: "/creator-studio/content/s2?kind=short" },
+  { id: "s3", title: "Shorts Title", viewsLabel: "12K views", whenLabel: "3 days ago", kind: "short", href: "/creator-studio/content/s3?kind=short" },
+  { id: "s4", title: "Shorts Title", viewsLabel: "12K views", whenLabel: "3 days ago", kind: "short", href: "/creator-studio/content/s4?kind=short" },
+  { id: "s5", title: "Shorts Title", viewsLabel: "12K views", whenLabel: "3 days ago", kind: "short", href: "/creator-studio/content/s5?kind=short" },
+];
 
 export default function LibraryPage() {
-  const router = useRouter();
-  const [checkingAuth, setCheckingAuth] = useState(true);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => {
-      if (!u) {
-        router.replace("/login");
-        return;
-      }
-      setUserEmail(u.email ?? null);
-      setCheckingAuth(false);
-    });
-    return () => unsub();
-  }, [router]);
-
-  if (checkingAuth) return <div className="p-6 text-white/90">Checking your session…</div>;
-
   return (
-    <div className="p-6">
-      <div className="mb-5 grid grid-cols-3 items-center">
-        <div />
-        <h1 className="text-center text-2xl font-semibold text-white">Content Library</h1>
-        <div className="text-right text-sm text-white/70">Signed in as {userEmail ?? "unknown"}</div>
-      </div>
+    <div>
+      <style>{`
+        .sectionTitle {
+          color: ${GOLD};
+          font-size: 28px;
+          font-weight: 900;
+          font-style: italic;
+          text-shadow:
+            1px 1px 0 #4a0b16,
+            2px 2px 0 #4a0b16,
+            3px 3px 0 rgba(0,0,0,0.5);
+        }
+        .gridWrap {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 24px;
+        }
+        @media (max-width: 1280px) {
+          .gridWrap { grid-template-columns: repeat(4, minmax(0,1fr)); }
+        }
+        @media (max-width: 1024px) {
+          .gridWrap { grid-template-columns: repeat(3, minmax(0,1fr)); }
+        }
+        @media (max-width: 768px) {
+          .gridWrap { grid-template-columns: repeat(2, minmax(0,1fr)); }
+        }
+      `}</style>
 
-      <div className="rounded-2xl border border-[var(--gold,#FFD700)]/80 bg-black/15 p-0 shadow-[0_0_0_1px_rgba(255,215,0,0.4)]">
-        <div className="p-5 md:p-6">
-          <RowSection title="Videos (16:9)" kind="video" count={14} />
-          <RowSection title="Shorts (9:16)" kind="short" count={18} />
+      <section style={{ marginTop: 8 }}>
+        <h2 className="sectionTitle">Videos</h2>
+        <div className="gridWrap" style={{ marginTop: 16 }}>
+          {videos.map((v) => (
+            <ContentCard key={v.id} {...v} />
+          ))}
         </div>
-      </div>
+      </section>
+
+      <section style={{ marginTop: 40 }}>
+        <h2 className="sectionTitle">Shorts</h2>
+        <div className="gridWrap" style={{ marginTop: 16 }}>
+          {shorts.map((s) => (
+            <ContentCard key={s.id} {...s} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
