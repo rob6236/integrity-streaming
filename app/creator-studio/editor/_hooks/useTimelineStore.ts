@@ -11,6 +11,7 @@ export type MediaItem = {
   url: string;
   kind: "video" | "image" | "other";
   from?: "device" | "uploads";
+  duration?: number; // seconds for videos
 };
 
 export type Clip = {
@@ -61,14 +62,18 @@ export const useTimelineStore = create<Store>((set, get) => ({
 
   timeline: [],
 
-  // ✅ CHANGE: when a clip is added, auto-select it and show in Viewer
   addToTimelineById: (id, lane) => {
     const { mediaPool, timeline } = get();
     const media = mediaPool.find((m) => m.id === id);
     if (!media) return;
 
-    // naive default duration: 10s for images, 30s for video
-    const defaultOut = media.kind === "image" ? 10 : 30;
+    // default duration: full video duration if known; 10s for images; otherwise 30s
+    const defaultOut =
+      media.kind === "image"
+        ? 10
+        : (typeof media.duration === "number" && media.duration > 0
+            ? media.duration
+            : 30);
 
     const clip: Clip = {
       id: media.id,
@@ -82,15 +87,13 @@ export const useTimelineStore = create<Store>((set, get) => ({
 
     const nextTimeline = [...timeline, clip];
 
-    // compute the new index within its lane so we can select it
+    // compute index in lane for selection
     const laneClips = nextTimeline.filter((c) => c.lane === lane);
     const newIndexInLane = laneClips.length - 1;
 
     set({
       timeline: nextTimeline,
-      // show the newly added clip in the Viewer
       previewUrl: media.url,
-      // and make it the active selection (so clicking other clips will also swap the Viewer)
       selected: { lane, index: newIndexInLane },
     });
   },

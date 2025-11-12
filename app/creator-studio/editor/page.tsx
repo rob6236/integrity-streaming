@@ -19,7 +19,7 @@ export default function EditorPage() {
     <div style={{ padding: "16px 0 24px 0", color: "#fff" }}>
       <h1 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 10px 0" }}>Editor</h1>
 
-      {/* TOP STRIP: 3 equal columns, short height to free vertical room */}
+      {/* TOP STRIP: 3 equal columns */}
       <div
         style={{
           display: "grid",
@@ -29,7 +29,7 @@ export default function EditorPage() {
           marginBottom: 16,
         }}
       >
-        {/* MEDIA POOL (smaller square-ish) */}
+        {/* MEDIA POOL */}
         <section style={{ ...CARD, height: 320, overflow: "hidden" }}>
           <div
             style={{
@@ -46,7 +46,7 @@ export default function EditorPage() {
           </div>
         </section>
 
-        {/* VIEWER (same width as others, slightly shorter vertical) */}
+        {/* VIEWER */}
         <section style={{ ...CARD, height: 320, overflow: "hidden" }}>
           <div
             style={{
@@ -63,7 +63,7 @@ export default function EditorPage() {
           </div>
         </section>
 
-        {/* INSPECTOR (smaller square-ish) */}
+        {/* INSPECTOR */}
         <section style={{ ...CARD, height: 320, overflow: "hidden" }}>
           <div
             style={{
@@ -81,7 +81,7 @@ export default function EditorPage() {
         </section>
       </div>
 
-      {/* TIMELINES (more vertical space; added 2 extra lanes in TimelineCanvas) */}
+      {/* TIMELINE */}
       <section style={{ ...CARD }}>
         <div
           style={{
@@ -92,7 +92,9 @@ export default function EditorPage() {
           }}
         >
           <span style={{ fontWeight: 800, letterSpacing: 0.3 }}>TIMELINE</span>
+          {/* (No buttons rendered here) */}
         </div>
+
         <div style={{ height: 520 }}>
           <TimelineCanvas />
         </div>

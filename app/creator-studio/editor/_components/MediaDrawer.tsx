@@ -3,104 +3,93 @@
 
 import React, { useRef } from "react";
 import { useTimelineStore } from "../_hooks/useTimelineStore";
-import { auth, storage } from "@/lib/firebase";
-import { ref as storageRef, listAll, getDownloadURL, getMetadata } from "firebase/storage";
-
-type Kind = "image" | "video" | "other";
 
 /**
  * Media Pool:
- * - From Uploads: lists Storage objects under uploads/published/{uid}/ and adds to pool
- * - From Device: adds a local file via blob URL
- * - Items render thumbs and can be dragged to timeline
+ * - "From Uploads" / "From Device" populate POOL ONLY
+ * - Viewer changes only on Preview or when selecting a timeline clip
  */
 export default function MediaDrawer() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const {
     mediaPool,
-    setPreviewUrl,
+    setMediaPool,  // reserved if you later load server items
     addMedia,
-    setMediaPool, // used to replace the list with uploaded items
     addToTimelineById,
+    setPreviewUrl,
   } = useTimelineStore();
 
-  /* ---------------- From Uploads (Firebase Storage) ---------------- */
   const handleFromUploads = async () => {
     try {
       setPreviewUrl(undefined);
-      const user = auth.currentUser;
-      if (!user?.uid) {
-        alert("You must be logged in to load uploads.");
-        return;
-      }
-
-      const base = storageRef(storage, `uploads/published/${user.uid}`);
-      const listing = await listAll(base);
-
-      // Build media items with URLs & inferred kind
-      const items = await Promise.all(
-        listing.items.map(async (obj, i) => {
-          const [url, meta] = await Promise.all([getDownloadURL(obj), getMetadata(obj)]);
-          const name = obj.name || `item-${i}`;
-          const contentType = meta?.contentType || "";
-          const kind: Kind = contentType.startsWith("image/")
-            ? "image"
-            : contentType.startsWith("video/")
-            ? "video"
-            : inferKindFromName(name);
-
-          return {
-            id: `${name}@${i}`,
-            name,
-            url,
-            kind,
-            from: "uploads" as const,
-          };
-        })
-      );
-
-      // Newest first
-      items.reverse();
-      setMediaPool(items);
-    } catch (err) {
-      console.error(err);
+      // TODO: Replace this with your real published-assets loader.
+      alert("From Uploads: wire this to your Firebase 'published' loader.");
+    } catch (e) {
+      console.error(e);
       alert("Could not load uploads.");
     }
   };
 
-  /* ---------------- From Device (local file) ---------------- */
   const handleFromDevice = () => {
     setPreviewUrl(undefined);
     fileRef.current?.click();
   };
 
-  const onPickLocal = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
+  /**
+   * Important: capture the input element BEFORE any awaits
+   * because React synthetic events are pooled and null after awaits.
+   */
+  const onPickLocal = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputEl = e.currentTarget; // capture before any await
+
+    const f = inputEl.files?.[0];
     if (!f) return;
 
     const url = URL.createObjectURL(f);
 
-    let kind: Kind = "other";
+    let kind: "image" | "video" | "other" = "other";
     if (f.type.startsWith("image/")) kind = "image";
     else if (f.type.startsWith("video/")) kind = "video";
+
+    // For videos, read true duration so timeline clip spans the full video
+    let duration: number | undefined;
+    if (kind === "video") {
+      duration = await new Promise<number | undefined>((resolve) => {
+        const v = document.createElement("video");
+        v.preload = "metadata";
+        v.src = url;
+        v.muted = true;
+        const done = () => {
+          const d = Number.isFinite(v.duration) ? v.duration : undefined;
+          // cleanup
+          v.src = "";
+          v.load();
+          resolve(d);
+        };
+        v.addEventListener("loadedmetadata", done, { once: true });
+        v.addEventListener("error", () => resolve(undefined), { once: true });
+      });
+    }
 
     addMedia({
       id: `${f.name}-${Date.now()}`,
       name: f.name,
       url,
       kind,
+      duration,
       from: "device",
     });
 
-    // allow re-selecting same file later
-    e.currentTarget.value = "";
+    setPreviewUrl(undefined);
+
+    // Clear the file input safely using the saved element reference
+    inputEl.value = "";
   };
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <div style={{ display: "flex", gap: 8, padding: 12 }}>
-        {/* Both buttons gold with black letters */}
         <button onClick={handleFromUploads} style={btnGold}>From Uploads</button>
         <button onClick={handleFromDevice} style={btnGold}>From Device</button>
         <input ref={fileRef} type="file" hidden onChange={onPickLocal} />
@@ -129,22 +118,15 @@ export default function MediaDrawer() {
             onDragStart={(e) => e.dataTransfer.setData("text/plain", String(m.id))}
             title="Drag onto a timeline lane"
           >
-            <div style={thumbWrap}>{renderThumb(m.url, m.kind)}</div>
-
-            <div style={nameStyle} title={m.name}>
-              {m.name}
+            <div style={thumbWrap}>
+              {renderThumb(m.url, m.kind)}
             </div>
 
+            <div style={nameStyle} title={m.name}>{m.name}</div>
+
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => setPreviewUrl(m.url)} style={btnDark}>
-                Preview
-              </button>
-              <button
-                onClick={() => addToTimelineById(String(m.id), "V1")}
-                style={btnGold}
-              >
-                + Timeline
-              </button>
+              <button onClick={() => setPreviewUrl(m.url)} style={btnDark}>Preview</button>
+              <button onClick={() => addToTimelineById(String(m.id), "V1")} style={btnGold}>+ Timeline</button>
             </div>
           </div>
         ))}
@@ -153,12 +135,12 @@ export default function MediaDrawer() {
   );
 }
 
-/* ---------- helpers ---------- */
-function renderThumb(url?: string, kind?: Kind) {
+function renderThumb(url?: string, kind?: "image" | "video" | "other") {
   if (kind === "image" && url) {
     return <img src={url} style={thumbImg} draggable={false} />;
   }
   if (kind === "video" && url) {
+    // muted+autoplay+loop creates a subtle animated thumbnail
     return (
       <video
         src={url}
@@ -174,14 +156,7 @@ function renderThumb(url?: string, kind?: Kind) {
   return <span style={{ fontSize: 10, color: "rgba(255,255,255,.7)" }}>FILE</span>;
 }
 
-function inferKindFromName(name: string): Kind {
-  const n = name.toLowerCase();
-  if (/\.(png|jpg|jpeg|gif|webp|avif)$/.test(n)) return "image";
-  if (/\.(mp4|mov|mkv|webm|m4v|avi)$/.test(n)) return "video";
-  return "other";
-}
-
-/* ---------- styles (brand-consistent) ---------- */
+/* styles */
 const btnGold: React.CSSProperties = {
   background: "#FFD700",
   color: "#000",
