@@ -24,14 +24,28 @@ export default function Viewer() {
   // Currently selected clip (may be undefined)
   const clip = useMemo(() => {
     if (!lane || idx < 0) return undefined;
-    const list = timeline.filter((c) => c.lane === lane);
+    const list = timeline.filter((c: any) => c.lane === lane);
     return list[idx];
   }, [timeline, lane, idx]);
 
-  // Live overrides sent from Inspector while dragging
+  // --- BASE LAYER TYPE (video vs image) -------------------------------
+  const isBaseImage = useMemo(() => {
+    if (!previewUrl) return false;
+
+    // If any clip in the timeline with this URL is marked as an image, treat as image
+    const match = (timeline as any[]).find(
+      (c) => c.url === previewUrl && c.kind === "image"
+    );
+    if (match) return true;
+
+    // Fallback: extension check
+    const clean = previewUrl.split("?")[0];
+    return /\.(png|jpg|jpeg|gif|webp)$/i.test(clean);
+  }, [previewUrl, timeline]);
+
+  // ---------------- Live style overrides from Inspector --------------
   const [override, setOverride] = useState<StylePatch | null>(null);
 
-  // Listen for Inspector -> Viewer live updates
   useEffect(() => {
     const onStyle = (e: Event) => {
       const { lane: l, idx: i, ...rest } = (e as CustomEvent).detail || {};
@@ -56,7 +70,7 @@ export default function Viewer() {
       const p = (v: any) => {
         const x = Number(v);
         return Number.isFinite(x) ? Math.min(100, Math.max(0, x)) : 0;
-        };
+      };
 
       const s = [
         n((clip as any)?.zoom, 1),
@@ -82,7 +96,6 @@ export default function Viewer() {
       cancelAnimationFrame(id);
     };
   }, [clip, previewUrl]);
-  // --------------------------------------------------------------------
 
   const num = (v: any, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
   const pct = (v: any) => {
@@ -90,11 +103,11 @@ export default function Viewer() {
     return Number.isFinite(x) ? Math.min(100, Math.max(0, x)) : 0;
   };
 
-  // Effective values: live override (if present) falls back to clip fields
+  // Effective transform values
   const zoom = num(override?.zoom ?? (clip as any)?.zoom, 1);
   const posX = num(override?.posX ?? (clip as any)?.posX, 0);
   const posY = num(override?.posY ?? (clip as any)?.posY, 0);
-  const rot  = num(override?.rot  ?? (clip as any)?.rot,  0);
+  const rot = num(override?.rot ?? (clip as any)?.rot, 0);
 
   const cropL = pct(override?.cropL ?? (clip as any)?.cropL);
   const cropR = pct(override?.cropR ?? (clip as any)?.cropR);
@@ -109,6 +122,7 @@ export default function Viewer() {
     clipPath: `inset(${cropT}% ${cropR}% ${cropB}% ${cropL}%)`,
     display: "grid",
     placeItems: "center",
+    position: "relative",
   };
 
   const mediaStyle: React.CSSProperties = {
@@ -117,14 +131,17 @@ export default function Viewer() {
     objectFit: "contain",
   };
 
-  // Keep Viewer video in sync with playhead scrubbing
+  // ---------------- PLAYHEAD TIME + VIDEO SYNC -----------------------
   const videoRef = useRef<HTMLVideoElement | null>(null);
   useEffect(() => {
     const onScrub = (e: Event) => {
       const detail = (e as CustomEvent).detail as { t?: number };
-      if (videoRef.current && typeof detail?.t === "number" && isFinite(detail.t)) {
+      const t =
+        typeof detail?.t === "number" && isFinite(detail.t) ? detail.t : 0;
+
+      if (videoRef.current) {
         try {
-          videoRef.current.currentTime = detail.t;
+          videoRef.current.currentTime = t;
         } catch {}
       }
     };
@@ -132,6 +149,22 @@ export default function Viewer() {
     return () => window.removeEventListener("timeline-scrub" as any, onScrub);
   }, []);
 
+  // ---------------- OVERLAY IMAGE (Overlay 1 + Overlay 2) ------------
+  // **ONLY CHANGE**: always take the first clip on Overlay 1 (O1),
+  // or if none, the first on Overlay 2 (V2), and draw its URL as an image.
+  const overlayClip = useMemo(() => {
+    const o1 = (timeline as any[]).filter((c) => c.lane === "O1");
+    if (o1.length > 0) return o1[0];
+
+    const v2 = (timeline as any[]).filter((c) => c.lane === "V2");
+    if (v2.length > 0) return v2[0];
+
+    return undefined;
+  }, [timeline]);
+
+  const overlayUrl: string | undefined = overlayClip?.url;
+
+  // -------------------------------------------------------------------
   return (
     <div
       style={{
@@ -147,10 +180,32 @@ export default function Viewer() {
     >
       {previewUrl ? (
         <div style={wrapperStyle}>
-          {/\.(png|jpg|jpeg|gif|webp)$/i.test(previewUrl) ? (
+          {/* BASE LAYER: whatever previewUrl currently is (usually Video 1) */}
+          {isBaseImage ? (
             <img src={previewUrl} alt="preview" style={mediaStyle} />
           ) : (
-            <video ref={videoRef} src={previewUrl} controls style={mediaStyle} />
+            <video
+              ref={videoRef}
+              src={previewUrl}
+              controls
+              style={mediaStyle}
+            />
+          )}
+
+          {/* OVERLAY LAYER: always draw first Overlay 1/2 clip (if any) */}
+          {overlayUrl && (
+            <img
+              src={overlayUrl}
+              alt="overlay"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                pointerEvents: "none",
+              }}
+            />
           )}
         </div>
       ) : (

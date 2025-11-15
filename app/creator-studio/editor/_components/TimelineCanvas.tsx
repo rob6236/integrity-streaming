@@ -1,20 +1,26 @@
 // app/creator-studio/editor/_components/TimelineCanvas.tsx
 "use client";
 
-import React, { useMemo, useState, useRef, useLayoutEffect, useEffect } from "react";
+import React, {
+  useMemo,
+  useState,
+  useRef,
+  useLayoutEffect,
+  useEffect,
+} from "react";
 import { useTimelineStore } from "../_hooks/useTimelineStore";
 
 const PX_PER_SEC_BY_ZOOM = [20, 40, 60, 90, 140];
 const LEFT_PAD = 64;
 
-/** ------ CHANGED: set editor/frame display to 24 fps ------ */
+/** ------ 24 fps timecode display ------ */
 const FPS = 24;
 function formatTimecode(seconds: number, fps = FPS) {
   const totalFrames = Math.max(0, Math.round(seconds * fps));
   const frames = totalFrames % fps;
   const totalSeconds = Math.floor(totalFrames / fps);
   const s = totalSeconds % 60;
-  const m = Math.floor(totalSeconds / 60) % 60;
+  const m = Math.floor(totalFrames / 60) % 60;
   const h = Math.floor(totalFrames / (fps * 3600));
   const pad = (n: number, w = 2) => String(n).padStart(w, "0");
   return `${pad(h)}:${pad(m)}:${pad(s)}:${pad(frames)}`;
@@ -51,7 +57,6 @@ type Clip = {
   out: number;
   lane: "V1" | "V2" | "O1" | "A1";
   start?: number;
-  // inspector fields may be attached dynamically (zoom, posX, posY, rot, cropL, cropR, cropT, cropB, soft)
 };
 
 type Tool = "select" | "trim" | "blade";
@@ -97,7 +102,9 @@ export default function TimelineCanvas() {
   };
 
   const getLaneClips = (lane: "V1" | "V2" | "O1" | "A1") =>
-    ((useTimelineStore as any).getState?.().timeline as Clip[]).filter((c) => c.lane === lane);
+    ((useTimelineStore as any).getState?.().timeline as Clip[]).filter(
+      (c) => c.lane === lane
+    );
 
   const addToTimelineById = (id: string, lane: "V1" | "V2" | "O1" | "A1") => {
     markLocalEdit();
@@ -110,7 +117,10 @@ export default function TimelineCanvas() {
     }
   };
 
-  const removeFromTimeline = (lane: "V1" | "V2" | "O1" | "A1", index: number) => {
+  const removeFromTimeline = (
+    lane: "V1" | "V2" | "O1" | "A1",
+    index: number
+  ) => {
     markLocalEdit();
     const beforeClips = getLaneClips(lane);
     const clip = beforeClips[index];
@@ -147,7 +157,10 @@ export default function TimelineCanvas() {
   const updateClip = (
     lane: "V1" | "V2" | "O1" | "A1",
     index: number,
-    patch: Partial<Pick<Clip, "in" | "out" | "start" | "url" | "name" | "kind">> & Record<string, any>
+    patch: Partial<
+      Pick<Clip, "in" | "out" | "start" | "url" | "name" | "kind">
+    > &
+      Record<string, any>
   ) => {
     markLocalEdit();
     const before = getLaneClips(lane)[index];
@@ -171,7 +184,9 @@ export default function TimelineCanvas() {
   const setZoom = (v: number) => setZoomRaw(v);
 
   /** External (Inspector) watcher -> push inverse changes to Undo */
-  const prevTimelineRef = useRef<Clip[]>(useTimelineStore.getState().timeline as any);
+  const prevTimelineRef = useRef<Clip[]>(
+    useTimelineStore.getState().timeline as any
+  );
   useEffect(() => {
     const prev = prevTimelineRef.current;
     const curr = (timeline as Clip[]) || [];
@@ -193,9 +208,12 @@ export default function TimelineCanvas() {
         });
         if (Object.keys(changed).length > 0) {
           const lane = c.lane as "V1" | "V2" | "O1" | "A1";
-          const laneList = (timeline as Clip[]).filter((x) => x.lane === lane);
+          const laneList = (timeline as Clip[]).filter(
+            (x) => x.lane === lane
+          );
           const idx = laneList.findIndex((x) => x.id === c.id);
-          if (idx >= 0) undoStackRef.current.push(() => updateRaw(lane, idx, changed));
+          if (idx >= 0)
+            undoStackRef.current.push(() => updateRaw(lane, idx, changed));
           break;
         }
       }
@@ -237,8 +255,9 @@ export default function TimelineCanvas() {
   const [tool, setTool] = useState<Tool>("select");
   const [toolsEnabled, setToolsEnabled] = useState(true);
 
+  /** ********** ONLY CHANGE: prefer Overlay 1, then Overlay 2, then Video 1 ********** */
   const urlUnderPlayhead = (t: number): string => {
-    const lanes: ("V1" | "V2" | "O1" | "A1")[] = ["V1", "V2", "O1", "A1"];
+    const lanes: ("V1" | "V2" | "O1" | "A1")[] = ["O1", "V2", "V1"];
     for (const lane of lanes) {
       const c = (timeline as Clip[]).find((clip) => {
         if (clip.lane !== lane) return false;
@@ -250,6 +269,7 @@ export default function TimelineCanvas() {
     }
     return "";
   };
+  /** ************************************************************************* */
 
   useEffect(() => {
     setPreviewUrl(urlUnderPlayhead(playhead));
@@ -257,7 +277,9 @@ export default function TimelineCanvas() {
 
   const syncScroll = () => {
     setPreviewUrl(urlUnderPlayhead(playhead));
-    window.dispatchEvent(new CustomEvent("timeline-scrub", { detail: { t: playhead } }));
+    window.dispatchEvent(
+      new CustomEvent("timeline-scrub", { detail: { t: playhead } })
+    );
   };
 
   useLayoutEffect(() => {}, [pxPerSec]);
@@ -266,17 +288,27 @@ export default function TimelineCanvas() {
     const tt = clampPlayhead(t);
     setPlayhead(tt);
     setPreviewUrl(urlUnderPlayhead(tt));
-    window.dispatchEvent(new CustomEvent("timeline-scrub", { detail: { t: tt } }));
+    window.dispatchEvent(
+      new CustomEvent("timeline-scrub", { detail: { t: tt } })
+    );
   };
 
   const liveResyncViewer = () => {
     setPreviewUrl(urlUnderPlayhead(playhead));
-    window.dispatchEvent(new CustomEvent("timeline-scrub", { detail: { t: playhead } }));
+    window.dispatchEvent(
+      new CustomEvent("timeline-scrub", { detail: { t: playhead } })
+    );
   };
 
-  const syncLinkedPairMove = (movedLane: "V1" | "A1", movedIdx: number, newStart: number) => {
+  const syncLinkedPairMove = (
+    movedLane: "V1" | "A1",
+    movedIdx: number,
+    newStart: number
+  ) => {
     if (!linkedVA) return;
-    const movedClip = (timeline as Clip[]).filter((c) => c.lane === movedLane)[movedIdx];
+    const movedClip = (timeline as Clip[]).filter(
+      (c) => c.lane === movedLane
+    )[movedIdx];
     if (!movedClip) return;
     const pairLane: "V1" | "A1" = movedLane === "V1" ? "A1" : "V1";
     const pairIdx = (timeline as Clip[])
@@ -294,11 +326,15 @@ export default function TimelineCanvas() {
     if (!linkedVA) return;
     if (sourceLane !== "V1" && sourceLane !== "A1") return;
 
-    const srcClip = (timeline as Clip[]).filter((c) => c.lane === sourceLane)[sourceIdx];
+    const srcClip = (timeline as Clip[]).filter(
+      (c) => c.lane === sourceLane
+    )[sourceIdx];
     if (!srcClip) return;
 
     const pairLane: "V1" | "A1" = sourceLane === "V1" ? "A1" : "V1";
-    const pairList = (timeline as Clip[]).filter((c) => c.lane === pairLane);
+    const pairList = (timeline as Clip[]).filter(
+      (c) => c.lane === pairLane
+    );
     const pairIdx = pairList.findIndex((c) => c.id === srcClip.id);
     if (pairIdx < 0) return;
 
@@ -318,11 +354,15 @@ export default function TimelineCanvas() {
     if (!linkedVA) return;
     if (sourceLane !== "V1" && sourceLane !== "A1") return;
 
-    const srcClip = (timeline as Clip[]).filter((c) => c.lane === sourceLane)[sourceIdx];
+    const srcClip = (timeline as Clip[]).filter(
+      (c) => c.lane === sourceLane
+    )[sourceIdx];
     if (!srcClip) return;
 
     const pairLane: "V1" | "A1" = sourceLane === "V1" ? "A1" : "V1";
-    const pairList = (timeline as Clip[]).filter((c) => c.lane === pairLane);
+    const pairList = (timeline as Clip[]).filter(
+      (c) => c.lane === pairLane
+    );
     const pairIdx = pairList.findIndex((c) => c.id === srcClip.id);
     if (pairIdx < 0) return;
 
@@ -338,15 +378,24 @@ export default function TimelineCanvas() {
     liveResyncViewer();
   };
 
-  const bladeCut = (laneKey: "V1" | "V2" | "O1" | "A1", clipIdx: number, tAbs: number) => {
-    const laneClipsNow = (timeline as Clip[]).filter((c) => c.lane === laneKey);
+  const bladeCut = (
+    laneKey: "V1" | "V2" | "O1" | "A1",
+    clipIdx: number,
+    tAbs: number
+  ) => {
+    const laneClipsNow = (timeline as Clip[]).filter(
+      (c) => c.lane === laneKey
+    );
     const clip = laneClipsNow[clipIdx];
     if (!clip) return;
 
     const st = clip.start ?? 0;
     the: {
       const rel = clip.in + (tAbs - st);
-      const safeRel = Math.max(clip.in + 0.05, Math.min(clip.out - 0.05, rel));
+      const safeRel = Math.max(
+        clip.in + 0.05,
+        Math.min(clip.out - 0.05, rel)
+      );
       if (safeRel <= clip.in + 0.05 || safeRel >= clip.out - 0.05) break the;
 
       const oldOut = clip.out;
@@ -356,7 +405,11 @@ export default function TimelineCanvas() {
       updateRaw(laneKey, clipIdx, { out: safeRel });
       const preLen = getLaneClips(laneKey).length;
       addRaw(clip.id, laneKey);
-      updateRaw(laneKey, preLen, { in: safeRel, out: oldOut, start: tAbs });
+      updateRaw(laneKey, preLen, {
+        in: safeRel,
+        out: oldOut,
+        start: tAbs,
+      });
       pushEnabledRef.current = true;
 
       undoStackRef.current.push(() => {
@@ -381,7 +434,16 @@ export default function TimelineCanvas() {
   );
   const IconBlade = () => (
     <svg width="20" height="16" viewBox="0 0 20 16" aria-hidden="true">
-      <rect x="2" y="3" width="16" height="10" rx="2" ry="2" fill="currentColor" opacity="0.25" />
+      <rect
+        x="2"
+        y="3"
+        width="16"
+        height="10"
+        rx="2"
+        ry="2"
+        fill="currentColor"
+        opacity="0.25"
+      />
       <path fill="currentColor" d="M6 8h2l1-2 2 4 1-2h2l2 2H4z" />
     </svg>
   );
@@ -404,13 +466,17 @@ export default function TimelineCanvas() {
       undo();
       queueMicrotask(() => {
         setPreviewUrl(urlUnderPlayhead(playhead));
-        window.dispatchEvent(new CustomEvent("timeline-scrub", { detail: { t: playhead } }));
+        window.dispatchEvent(
+          new CustomEvent("timeline-scrub", { detail: { t: playhead } })
+        );
       });
     }
   };
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <div
+      style={{ height: "100%", display: "flex", flexDirection: "column" }}
+    >
       <div
         style={{
           height: 40,
@@ -427,7 +493,11 @@ export default function TimelineCanvas() {
         <span style={{ marginRight: 6 }}>{formatTimecode(playhead)}</span>
 
         <button
-          title={toolsEnabled ? "Safety: ON (tools allowed)" : "Safety: OFF (tools locked)"}
+          title={
+            toolsEnabled
+              ? "Safety: ON (tools allowed)"
+              : "Safety: OFF (tools locked)"
+          }
           style={toolBtnStyle(toolsEnabled)}
           onClick={() => {
             setToolsEnabled((on) => {
@@ -464,7 +534,9 @@ export default function TimelineCanvas() {
         <button
           type="button"
           onClick={() => setLinkedVA((v) => !v)}
-          title={linkedVA ? "Unlink Video 1 and Audio 1" : "Link Video 1 and Audio 1"}
+          title={
+            linkedVA ? "Unlink Video 1 and Audio 1" : "Link Video 1 and Audio 1"
+          }
           style={{
             marginLeft: 8,
             padding: "6px 10px",
@@ -510,7 +582,14 @@ export default function TimelineCanvas() {
           Undo
         </button>
 
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+        <div
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
           <span>Zoom</span>
           <input
             type="range"
@@ -583,7 +662,7 @@ export default function TimelineCanvas() {
 
         <LaneRow
           index={2}
-          title="Overlay"
+          title="Overlay 1"
           width={maxDuration * pxPerSec}
           laneKey="O1"
           onDropId={(id) => {
@@ -610,7 +689,7 @@ export default function TimelineCanvas() {
 
         <LaneRow
           index={3}
-          title="Overlay"
+          title="Overlay 2"
           width={maxDuration * pxPerSec}
           laneKey="V2"
           onDropId={(id) => {
@@ -657,9 +736,17 @@ type LaneRowProps = {
   onLaneScroll: (fromIndex: number, value: number) => void;
   onDidMoveClipEnd: () => void;
   onDidMoveClipLive: () => void;
-  onLinkedMove?: (movedLane: "V1" | "A1", movedIdx: number, newStart: number) => void;
+  onLinkedMove?: (
+    movedLane: "V1" | "A1",
+    movedIdx: number,
+    newStart: number
+  ) => void;
   tool: Tool;
-  onBladeCut: (laneKey: "V1" | "V2" | "O1" | "A1", clipIdx: number, tAbs: number) => void;
+  onBladeCut: (
+    laneKey: "V1" | "V2" | "O1" | "A1",
+    clipIdx: number,
+    tAbs: number
+  ) => void;
   onLinkedLeftTrim?: (
     sourceLane: "V1" | "A1",
     sourceIdx: number,
@@ -674,171 +761,190 @@ type LaneRowProps = {
   ) => void;
 };
 
-const LaneRow = React.forwardRef<HTMLDivElement, LaneRowProps>(function LaneRow(
-  {
-    index,
-    title,
-    width,
-    laneKey,
-    onDropId,
-    timeline,
-    pxPerSec,
-    selected,
-    setSelected,
-    setPreviewUrl,
-    removeFromTimeline,
-    updateClip,
-    playhead,
-    onScrub,
-    onLaneScroll,
-    onDidMoveClipEnd,
-    onDidMoveClipLive,
-    onLinkedMove,
-    tool,
-    onBladeCut,
-    onLinkedLeftTrim,
-    onLinkedRightTrim,
-  },
-  ref
-) {
-  const selfRef = useRef<HTMLDivElement | null>(null);
-  React.useImperativeHandle(ref, () => selfRef.current as HTMLDivElement);
+const LaneRow = React.forwardRef<HTMLDivElement, LaneRowProps>(
+  function LaneRow(
+    {
+      index,
+      title,
+      width,
+      laneKey,
+      onDropId,
+      timeline,
+      pxPerSec,
+      selected,
+      setSelected,
+      setPreviewUrl,
+      removeFromTimeline,
+      updateClip,
+      playhead,
+      onScrub,
+      onLaneScroll,
+      onDidMoveClipEnd,
+      onDidMoveClipLive,
+      onLinkedMove,
+      tool,
+      onBladeCut,
+      onLinkedLeftTrim,
+      onLinkedRightTrim,
+    },
+    ref
+  ) {
+    const selfRef = useRef<HTMLDivElement | null>(null);
+    React.useImperativeHandle(ref, () => selfRef.current as HTMLDivElement);
 
-  const clips = timeline.filter((c) => c.lane === laneKey);
+    const clips = timeline.filter((c) => c.lane === laneKey);
 
-  const scrubFromEvent = (e: MouseEvent | React.MouseEvent) => {
-    if (!selfRef.current) return;
-    const rect = selfRef.current.getBoundingClientRect();
-    const sc = selfRef.current.scrollLeft;
-    const clientX = "clientX" in e ? e.clientX : 0;
-    const x = clientX - rect.left + sc - LEFT_PAD;
-    onScrub(x / pxPerSec);
-  };
-
-  const onHandleDown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    scrubFromEvent(e);
-    const move = (ev: MouseEvent) => scrubFromEvent(ev);
-    const up = () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseup", up);
+    const scrubFromEvent = (e: MouseEvent | React.MouseEvent) => {
+      if (!selfRef.current) return;
+      const rect = selfRef.current.getBoundingClientRect();
+      const sc = selfRef.current.scrollLeft;
+      const clientX = "clientX" in e ? e.clientX : 0;
+      const x = clientX - rect.left + sc - LEFT_PAD;
+      onScrub(x / pxPerSec);
     };
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", up);
-  };
 
-  return (
-    <div
-      ref={selfRef}
-      style={laneRowStyle}
-      onScroll={(e) => onLaneScroll(index, (e.currentTarget as HTMLDivElement).scrollLeft)}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const id = e.dataTransfer.getData("text/plain");
-        if (id) onDropId(id);
-      }}
-    >
-      <div style={laneTitleStyle}>{title}</div>
+    const onHandleDown = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      scrubFromEvent(e);
+      const move = (ev: MouseEvent) => scrubFromEvent(ev);
+      const up = () => {
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", up);
+      };
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", up);
+    };
 
+    return (
       <div
-        style={{
-          width,
-          height: "100%",
-          position: "relative",
-          display: "block",
-          paddingLeft: LEFT_PAD,
+        ref={selfRef}
+        style={laneRowStyle}
+        onScroll={(e) =>
+          onLaneScroll(index, (e.currentTarget as HTMLDivElement).scrollLeft)
+        }
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const id = e.dataTransfer.getData("text/plain");
+          if (id) onDropId(id);
         }}
       >
-        {/* Playhead */}
+        <div style={laneTitleStyle}>{title}</div>
+
+        <div
+          style={{
+            width,
+            height: "100%",
+            position: "relative",
+            display: "block",
+            paddingLeft: LEFT_PAD,
+          }}
+        >
+          {/* Playhead */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: LEFT_PAD + playhead * pxPerSec,
+              bottom: 0,
+              width: 2,
+              background: "rgba(255,60,60,.95)",
+              pointerEvents: "none",
+              zIndex: 5,
+            }}
+          />
+          <div
+            onMouseDown={onHandleDown}
+            title="Drag to scrub"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: LEFT_PAD + playhead * pxPerSec - 6,
+              bottom: 0,
+              width: 12,
+              cursor: "ew-resize",
+              zIndex: 6,
+              background: "transparent",
+            }}
+          />
+
+          {clips.map((clip, idx) => {
+            const st = typeof clip.start === "number" ? clip.start : 0;
+            const left = LEFT_PAD + st * pxPerSec;
+
+            return (
+              <ClipBar
+                key={`${clip.id}-${laneKey}-${idx}`}
+                clip={clip}
+                pxPerSec={pxPerSec}
+                left={left}
+                selected={
+                  selected?.lane === laneKey && selected.index === idx
+                }
+                onSelect={() => {
+                  setSelected({ lane: laneKey, index: idx });
+                  // Keep viewer on the main video when overlay lanes are selected.
+                  if (laneKey === "V1" || laneKey === "V2" || laneKey === "A1") {
+                    if (clip.url) setPreviewUrl(clip.url);
+                  }
+                }}
+                onRemove={() => removeFromTimeline(laneKey, idx)}
+                onTrimStart={(val: number) =>
+                  updateClip(laneKey, idx, { in: val })
+                }
+                onTrimEnd={(val: number) =>
+                  updateClip(laneKey, idx, { out: val })
+                }
+                onDragMove={(newLeftPx: number) => {
+                  const newStart = Math.max(
+                    0,
+                    (newLeftPx - LEFT_PAD) / pxPerSec
+                  );
+                  updateClip(laneKey, idx, { start: newStart });
+                  if (onLinkedMove && (laneKey === "V1" || laneKey === "A1"))
+                    onLinkedMove(laneKey, idx, newStart);
+                  onDidMoveClipLive();
+                }}
+                onDragEnd={onDidMoveClipEnd}
+                isAudio={laneKey === "A1"}
+                tool={tool}
+                onBladeClick={(tAbs) => onBladeCut(laneKey, idx, tAbs)}
+                onLeftTrimLive={(newIn, deltaIn) => {
+                  if (onLinkedLeftTrim && (laneKey === "V1" || laneKey === "A1")) {
+                    onLinkedLeftTrim(laneKey, idx, newIn, deltaIn);
+                  }
+                }}
+                onRightTrimLive={(newOut, deltaOut) => {
+                  if (
+                    onLinkedRightTrim &&
+                    (laneKey === "V1" || laneKey === "A1")
+                  ) {
+                    onLinkedRightTrim(laneKey, idx, newOut, deltaOut);
+                  }
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* t=0 marker */}
         <div
           style={{
             position: "absolute",
             top: 0,
-            left: LEFT_PAD + playhead * pxPerSec,
+            left: LEFT_PAD,
             bottom: 0,
             width: 2,
-            background: "rgba(255,60,60,.95)",
+            background: "rgba(255,215,0,.9)",
+            boxShadow: "0 0 0 1px rgba(0,0,0,.6)",
             pointerEvents: "none",
-            zIndex: 5,
           }}
         />
-        <div
-          onMouseDown={onHandleDown}
-          title="Drag to scrub"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: LEFT_PAD + playhead * pxPerSec - 6,
-            bottom: 0,
-            width: 12,
-            cursor: "ew-resize",
-            zIndex: 6,
-            background: "transparent",
-          }}
-        />
-
-        {clips.map((clip, idx) => {
-          const st = typeof clip.start === "number" ? clip.start : 0;
-          const left = LEFT_PAD + st * pxPerSec;
-
-          return (
-            <ClipBar
-              key={`${clip.id}-${laneKey}-${idx}`}
-              clip={clip}
-              pxPerSec={pxPerSec}
-              left={left}
-              selected={selected?.lane === laneKey && selected.index === idx}
-              onSelect={() => {
-                setSelected({ lane: laneKey, index: idx });
-                if (clip.url) setPreviewUrl(clip.url);
-              }}
-              onRemove={() => removeFromTimeline(laneKey, idx)}
-              onTrimStart={(val: number) => updateClip(laneKey, idx, { in: val })}
-              onTrimEnd={(val: number) => updateClip(laneKey, idx, { out: val })}
-              onDragMove={(newLeftPx: number) => {
-                const newStart = Math.max(0, (newLeftPx - LEFT_PAD) / pxPerSec);
-                updateClip(laneKey, idx, { start: newStart });
-                if (onLinkedMove && (laneKey === "V1" || laneKey === "A1"))
-                  onLinkedMove(laneKey, idx, newStart);
-                onDidMoveClipLive();
-              }}
-              onDragEnd={onDidMoveClipEnd}
-              isAudio={laneKey === "A1"}
-              tool={tool}
-              onBladeClick={(tAbs) => onBladeCut(laneKey, idx, tAbs)}
-              onLeftTrimLive={(newIn, deltaIn) => {
-                if (onLinkedLeftTrim && (laneKey === "V1" || laneKey === "A1")) {
-                  onLinkedLeftTrim(laneKey, idx, newIn, deltaIn);
-                }
-              }}
-              onRightTrimLive={(newOut, deltaOut) => {
-                if (onLinkedRightTrim && (laneKey === "V1" || laneKey === "A1")) {
-                  onLinkedRightTrim(laneKey, idx, newOut, deltaOut);
-                }
-              }}
-            />
-          );
-        })}
       </div>
-
-      {/* t=0 marker */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: LEFT_PAD,
-          bottom: 0,
-          width: 2,
-          background: "rgba(255,215,0,.9)",
-          boxShadow: "0 0 0 1px rgba(0,0,0,.6)",
-          pointerEvents: "none",
-        }}
-      />
-    </div>
-  );
-});
+    );
+  }
+);
 
 /* ------------------------ Filmstrip generator (video) ------------------------ */
 function useFilmstripDense(
@@ -878,7 +984,8 @@ function useFilmstripDense(
       const span = Math.max(0.1, (clipEnd || duration) - clipStart);
 
       const targetH = 72;
-      const aspect = video.videoWidth > 0 ? video.videoWidth / video.videoHeight : 16 / 9;
+      const aspect =
+        video.videoWidth > 0 ? video.videoWidth / video.videoHeight : 16 / 9;
       const canvasH = targetH;
       const canvasW = Math.round(targetH * aspect);
       canvas.height = canvasH;
@@ -919,7 +1026,6 @@ function useFilmstripDense(
 }
 
 /* ------------------------ Waveform generator (audio) ------------------------ */
-/** Draws a Resolve-style filled green waveform for Audio 1 lane. */
 function useAudioWaveform(
   url?: string,
   clipInSec: number = 0,
@@ -941,17 +1047,16 @@ function useAudioWaveform(
         const resp = await fetch(url, { mode: "cors" });
         const buf = await resp.arrayBuffer();
 
-        // Use OfflineAudioContext for decoding
-        const audioCtx = new (window.OfflineAudioContext ||
-          (window as any).webkitOfflineAudioContext)(1, 44100 * 1, 44100);
-        const audioBuffer = await audioCtx.decodeAudioData(buf.slice(0)); // clone for Safari
+        const audioCtx =
+          new (window.OfflineAudioContext ||
+            (window as any).webkitOfflineAudioContext)(1, 44100 * 1, 44100);
+        const audioBuffer = await audioCtx.decodeAudioData(buf.slice(0));
 
         const duration = audioBuffer.duration;
         const start = Math.max(0, clipInSec);
         const end = Math.max(start + 0.1, clipOutSec || duration);
         const span = Math.min(duration, end) - start;
 
-        // Sample into N buckets across width
         const buckets = Math.max(100, Math.floor(widthPx / 2));
         const channel = audioBuffer.getChannelData(0);
         const sampleRate = audioBuffer.sampleRate;
@@ -972,12 +1077,11 @@ function useAudioWaveform(
 
         const canvas = document.createElement("canvas");
         canvas.width = widthPx;
-        canvas.height = Math.max(60, Math.floor(heightPx - 34)); // below the controls row
+        canvas.height = Math.max(60, Math.floor(heightPx - 34));
         const ctx = canvas.getContext("2d")!;
         ctx.fillStyle = "#0b0b0b";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw baseline and filled waveform
         const mid = Math.floor(canvas.height / 2);
         ctx.beginPath();
         ctx.moveTo(0, mid);
@@ -994,10 +1098,9 @@ function useAudioWaveform(
           ctx.lineTo(x, y);
         }
         ctx.closePath();
-        ctx.fillStyle = "rgba(0,180,90,0.95)"; // Resolve-like green
+        ctx.fillStyle = "rgba(0,180,90,0.95)";
         ctx.fill();
 
-        // subtle top gloss
         const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
         grad.addColorStop(0, "rgba(255,255,255,0.08)");
         grad.addColorStop(1, "rgba(255,255,255,0.00)");
@@ -1057,16 +1160,26 @@ function ClipBar({
   const duration = Math.max(1, clip.out - clip.in);
   const width = Math.max(140, duration * pxPerSec);
 
-  const strip = useFilmstripDense(clip.url, clip.kind as any, clip.in, clip.out, width, 20);
+  const strip = useFilmstripDense(
+    clip.url,
+    clip.kind as any,
+    clip.in,
+    clip.out,
+    width,
+    20
+  );
 
-  /** ------ NEW: high-quality waveform for Audio 1 ------ */
   const waveform = useAudioWaveform(
     clip.url,
     clip.in,
     clip.out,
     Math.floor(width),
-    94 // matches lane height; hook internally subtracts header
+    94
   );
+
+  // How many "frames" of the overlay image to show across the bar
+  const imageTileCount =
+    clip.kind === "image" && clip.url ? Math.max(3, Math.floor(width / 80)) : 0;
 
   const dragState = useRef<{ startX: number; startLeft: number } | null>(null);
   const trimState = useRef<null | {
@@ -1107,9 +1220,15 @@ function ClipBar({
 
       if (trimState.current.edge === "left") {
         const proposedIn = trimState.current.startIn + dSec;
-        const newIn = Math.max(0, Math.min(trimState.current.startOut - 0.1, proposedIn));
+        const newIn = Math.max(
+          0,
+          Math.min(trimState.current.startOut - 0.1, proposedIn)
+        );
         const delta = newIn - trimState.current.startIn;
-        const newStartSec = Math.max(0, trimState.current.startStart + delta);
+        const newStartSec = Math.max(
+          0,
+          trimState.current.startStart + delta
+        );
         const newLeftPx = LEFT_PAD + newStartSec * pxPerSec;
 
         onTrimStart(newIn);
@@ -1117,7 +1236,10 @@ function ClipBar({
         onLeftTrimLive && onLeftTrimLive(newIn, delta);
       } else {
         const proposedOut = trimState.current.startOut + dSec;
-        const newOut = Math.max(trimState.current.startIn + 0.1, proposedOut);
+        const newOut = Math.max(
+          trimState.current.startIn + 0.1,
+          proposedOut
+        );
         const delta = newOut - trimState.current.startOut;
 
         onTrimEnd(newOut);
@@ -1184,7 +1306,9 @@ function ClipBar({
         width,
         height: 94,
         borderRadius: 8,
-        border: `1px solid ${selected ? "rgba(255,215,0,.9)" : "rgba(255,255,255,.12)"}`,
+        border: `1px solid ${
+          selected ? "rgba(255,215,0,.9)" : "rgba(255,255,255,.12)"
+        }`,
         background: "rgba(0,0,0,.6)",
         color: "#fff",
         boxShadow: selected
@@ -1245,10 +1369,14 @@ function ClipBar({
               src={waveform}
               alt=""
               draggable={false}
-              style={{ position: "absolute", inset: 0, objectFit: "cover", opacity: 0.98 }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                objectFit: "cover",
+                opacity: 0.98,
+              }}
             />
           ) : (
-            // Fallback (if decoding blocked)
             <div
               style={{
                 position: "absolute",
@@ -1261,6 +1389,31 @@ function ClipBar({
               }}
             />
           )
+        ) : clip.kind === "image" && clip.url && imageTileCount > 0 ? (
+          // IMAGE OVERLAY: repeated "frames" of the same image across the bar
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "grid",
+              gridTemplateColumns: `repeat(${imageTileCount}, 1fr)`,
+              background: "#111",
+            }}
+          >
+            {Array.from({ length: imageTileCount }).map((_, i) => (
+              <img
+                key={i}
+                src={clip.url}
+                alt=""
+                draggable={false}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            ))}
+          </div>
         ) : strip.length > 0 ? (
           <div
             style={{
@@ -1286,7 +1439,8 @@ function ClipBar({
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,.15))",
+            background:
+              "linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,.15))",
             pointerEvents: "none",
           }}
         />
