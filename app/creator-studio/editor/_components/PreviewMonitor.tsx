@@ -123,7 +123,7 @@ export default function PreviewMonitor() {
     let cropB = pct(targetClip?.cropB);
 
     // Apply live override ONLY if this is the selected clip
-    if (targetClip && clip && targetClip.id === (clip as any).id && override) {
+    if (targetClip && clip && targetClip === clip && override) {
       if (override.zoom !== undefined) zoom = num(override.zoom, zoom);
       if (override.posX !== undefined) posX = num(override.posX, posX);
       if (override.posY !== undefined) posY = num(override.posY, posY);
@@ -233,7 +233,14 @@ export default function PreviewMonitor() {
               <img
                 src={overlaySrc}
                 alt="overlay"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                style={{
+                  // key change: make sure overlay image always fits well inside viewer
+                  width: "80%",
+                  height: "auto",
+                  maxWidth: "80%",
+                  maxHeight: "80%",
+                  objectFit: "contain",
+                }}
               />
             </div>
           )}

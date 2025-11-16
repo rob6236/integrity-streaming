@@ -26,13 +26,20 @@ function formatTimecode(seconds: number, fps = FPS) {
   return `${pad(h)}:${pad(m)}:${pad(s)}:${pad(frames)}`;
 }
 
+/**
+ * Lane row styling
+ * CHANGE #1:
+ *  - backgroundColor set to pure black ("#000000")
+ *  - height increased from 110 to 165 (shorter than the very tall version,
+ *    but still taller than the old tiny lanes)
+ */
 const laneRowStyle: React.CSSProperties = {
-  backgroundColor: "rgba(255,255,255,.05)",
+  backgroundColor: "#000000", // was rgba(255,255,255,.05)
   border: "1px solid rgba(255,255,255,.10)",
   borderRadius: 8,
   padding: 8,
   position: "relative",
-  height: 110,
+  height: 165, // adjusted vertical size
   overflowX: "auto",
   overflowY: "hidden",
   whiteSpace: "nowrap",
@@ -255,7 +262,7 @@ export default function TimelineCanvas() {
   const [tool, setTool] = useState<Tool>("select");
   const [toolsEnabled, setToolsEnabled] = useState(true);
 
-  /** ********** ONLY CHANGE: prefer Overlay 1, then Overlay 2, then Video 1 ********** */
+  /** Prefer overlay lanes first (O1, V2) then main video (V1) */
   const urlUnderPlayhead = (t: number): string => {
     const lanes: ("V1" | "V2" | "O1" | "A1")[] = ["O1", "V2", "V1"];
     for (const lane of lanes) {
@@ -269,7 +276,6 @@ export default function TimelineCanvas() {
     }
     return "";
   };
-  /** ************************************************************************* */
 
   useEffect(() => {
     setPreviewUrl(urlUnderPlayhead(playhead));
@@ -911,7 +917,10 @@ const LaneRow = React.forwardRef<HTMLDivElement, LaneRowProps>(
                 tool={tool}
                 onBladeClick={(tAbs) => onBladeCut(laneKey, idx, tAbs)}
                 onLeftTrimLive={(newIn, deltaIn) => {
-                  if (onLinkedLeftTrim && (laneKey === "V1" || laneKey === "A1")) {
+                  if (
+                    onLinkedLeftTrim &&
+                    (laneKey === "V1" || laneKey === "A1")
+                  ) {
                     onLinkedLeftTrim(laneKey, idx, newIn, deltaIn);
                   }
                 }}
@@ -962,7 +971,10 @@ function useFilmstripDense(
       setStrip([]);
       return;
     }
-    const tiles = Math.max(1, Math.floor(barPixelWidth / Math.max(8, tilePixelWidth)));
+    const tiles = Math.max(
+      1,
+      Math.floor(barPixelWidth / Math.max(8, tilePixelWidth))
+    );
     const video = document.createElement("video");
     video.crossOrigin = "anonymous";
     video.muted = true;
@@ -1031,7 +1043,7 @@ function useAudioWaveform(
   clipInSec: number = 0,
   clipOutSec: number = 0,
   widthPx: number = 300,
-  heightPx: number = 94
+  heightPx: number = 142 // CHANGE #2: match taller lane / clip height
 ) {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
 
@@ -1174,7 +1186,7 @@ function ClipBar({
     clip.in,
     clip.out,
     Math.floor(width),
-    94
+    142 // CHANGE #3: match new clip height
   );
 
   // How many "frames" of the overlay image to show across the bar
@@ -1304,7 +1316,7 @@ function ClipBar({
         left,
         top: 8,
         width,
-        height: 94,
+        height: 142, // CHANGE #4: clip bar vertical size
         borderRadius: 8,
         border: `1px solid ${
           selected ? "rgba(255,215,0,.9)" : "rgba(255,255,255,.12)"

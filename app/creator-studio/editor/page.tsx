@@ -14,10 +14,39 @@ const CARD: React.CSSProperties = {
   color: "#fff",
 };
 
+const RENDER_BUTTON: React.CSSProperties = {
+  background: "#FFD700",
+  color: "#000",
+  border: "none",
+  borderRadius: 999,
+  padding: "6px 14px",
+  fontSize: 13,
+  fontWeight: 700,
+  cursor: "pointer",
+  boxShadow: "0 0 0 1px rgba(0,0,0,.5)",
+  whiteSpace: "nowrap",
+};
+
 export default function EditorPage() {
+  // Placeholder handler – later you can navigate to your render page
+  // and pass whatever data you need.
+  const handleSendToRender = () => {
+    // TODO: wire this to the render page when it exists
+    console.log("Send to Render clicked – hook this up to the render page.");
+  };
+
   return (
-    <div style={{ padding: "16px 0 24px 0", color: "#fff" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 10px 0" }}>Editor</h1>
+    <div
+      style={{
+        padding: "16px 12px 24px 12px",
+        color: "#fff",
+        maxWidth: 1400,
+        margin: "0 auto",
+      }}
+    >
+      <h1 style={{ fontSize: 28, fontWeight: 800, margin: "0 0 10px 0" }}>
+        Editor
+      </h1>
 
       {/* TOP STRIP: 3 equal columns */}
       <div
@@ -75,7 +104,13 @@ export default function EditorPage() {
           >
             INSPECTOR
           </div>
-          <div style={{ height: "calc(100% - 42px)", padding: 12, overflowY: "auto" }}>
+          <div
+            style={{
+              height: "calc(100% - 42px)",
+              padding: 12,
+              overflowY: "auto",
+            }}
+          >
             <Inspector />
           </div>
         </section>
@@ -89,10 +124,18 @@ export default function EditorPage() {
             borderBottom: "1px solid rgba(255,255,255,.10)",
             display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
           }}
         >
-          <span style={{ fontWeight: 800, letterSpacing: 0.3 }}>TIMELINE</span>
-          {/* (No buttons rendered here) */}
+          <span style={{ fontWeight: 800, letterSpacing: 0.3 }}>
+            TIMELINE
+          </span>
+
+          {/* Send to Render (stubbed for future render page) */}
+          <button style={RENDER_BUTTON} onClick={handleSendToRender}>
+            Send to Render
+          </button>
         </div>
 
         <div style={{ height: 520 }}>

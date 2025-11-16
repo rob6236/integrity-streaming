@@ -18,7 +18,8 @@ export default function UploadPage() {
 
       setMessage("Uploading...");
       const url = await uploadPublishedWithCache(file, user.uid);
-      setMessage(`Upload complete! Public URL: ${url}`);
+      // Only show a clean success message to creators
+      setMessage("Upload complete!");
     } catch (error: any) {
       console.error(error);
       setMessage(`Upload failed: ${error.message}`);
