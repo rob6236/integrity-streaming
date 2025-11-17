@@ -1,25 +1,48 @@
+// app/creator-studio/posts/page.tsx
 "use client";
 
-import Link from "next/link";
+import SocialFeed from "../../_components/social/SocialFeed";
+import PostComposer from "../../_components/social/PostComposer";
 
 export default function PostsPage() {
-  const burgundy = "#7B0F24";
-  const gold = "#FFD700";
-  const ivory = "#FFF9F0";
   return (
-    <div style={{ minHeight: "100vh", background: burgundy, color: ivory, padding: "24px 20px" }}>
-      <header style={{ maxWidth: 1200, margin: "0 auto 16px" }}>
-        <h1 style={{ margin: 0, color: gold, fontWeight: 800 }}>Posts (Social)</h1>
-        <nav style={{ marginTop: 8, display: "flex", gap: 12 }}>
-          <Link href="/creator-studio" style={{ color: gold }}>Dashboard</Link>
-          <Link href="/creator-studio/library" style={{ color: gold }}>Content Library</Link>
-        </nav>
-      </header>
-      <main style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ border: `1px solid ${gold}66`, borderRadius: 14, padding: 20, background: "rgba(0,0,0,0.18)" }}>
-          <p>Posts placeholder. Composer, feed preview, and scheduling will go here.</p>
-        </div>
-      </main>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#7B0F24",
+        color: "#FFF9F0",
+        padding: 24,
+      }}
+    >
+      <h1
+        style={{
+          fontSize: 28,
+          fontWeight: 700,
+          color: "#FFD700",
+          marginBottom: 16,
+        }}
+      >
+        Posts (Social)
+      </h1>
+
+      <p style={{ marginBottom: 24, opacity: 0.85 }}>
+        Create posts for your channel’s social feed. Your viewers will see these
+        on your channel home page and in their Integrity Streaming feed.
+      </p>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.4fr) minmax(0, 1fr)",
+          gap: 24,
+        }}
+      >
+        {/* Left: Composer */}
+        <PostComposer />
+
+        {/* Right: Preview feed */}
+        <SocialFeed variant="studio" />
+      </div>
     </div>
   );
 }

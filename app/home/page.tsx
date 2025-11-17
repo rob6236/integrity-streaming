@@ -24,7 +24,10 @@ function goldOutline(style: CSSProperties = {}): CSSProperties {
 /* ---- Small UI bits ---- */
 function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <button className="gold-button-outline" style={{ borderRadius: 12, padding: "8px 14px" }}>
+    <button
+      className="gold-button-outline"
+      style={{ borderRadius: 12, padding: "8px 14px" }}
+    >
       {children}
     </button>
   );
@@ -37,7 +40,8 @@ function MetricChip({ label }: { label: string }) {
         padding: "4px 8px",
         borderRadius: 10,
         border: `1px solid ${gold}`,
-        boxShadow: "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+        boxShadow:
+          "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
         fontSize: 13,
       }}
     >
@@ -59,8 +63,12 @@ function VideoTile({ compact = false }: { compact?: boolean }) {
           marginBottom: 12,
         }}
       />
-      <div style={{ color: ivory, fontSize: 15, fontWeight: 600 }}>Video title goes here</div>
-      <div style={{ opacity: 0.8, fontSize: 13, marginTop: 2 }}>Channel • 12k views • 2 days ago</div>
+      <div style={{ color: ivory, fontSize: 15, fontWeight: 600 }}>
+        Video title goes here
+      </div>
+      <div style={{ opacity: 0.8, fontSize: 13, marginTop: 2 }}>
+        Channel • 12k views • 2 days ago
+      </div>
       <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
         <button className="gold-button">Watch</button>
         <button className="gold-button-outline">Save</button>
@@ -72,7 +80,15 @@ function VideoTile({ compact = false }: { compact?: boolean }) {
 
 function RowHeader({ title }: { title: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 18, marginBottom: 8 }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginTop: 18,
+        marginBottom: 8,
+      }}
+    >
       <h2 style={{ fontWeight: 700, fontSize: 18, color: ivory }}>{title}</h2>
       <div style={{ marginLeft: "auto" }}>
         <Pill>View all</Pill>
@@ -148,7 +164,8 @@ function FeedCard({
                   padding: "2px 6px",
                   borderRadius: 999,
                   border: `1px solid ${gold}`,
-                  boxShadow: "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+                  boxShadow:
+                    "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
                 }}
               >
                 {c}
@@ -177,7 +194,13 @@ export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-[1200px] px-4 md:px-6 pb-16">
       {/* HEADER */}
-      <div style={goldOutline({ background: "transparent", padding: 16, marginTop: 16 })}>
+      <div
+        style={goldOutline({
+          background: "transparent",
+          padding: 16,
+          marginTop: 16,
+        })}
+      >
         <div
           style={{
             display: "grid",
@@ -230,14 +253,49 @@ export default function HomePage() {
             Integrity <span style={{ fontStyle: "normal" }}>Streaming</span>
           </h1>
 
-          {/* Buttons (right) — Home link + reactive Create/Login/Logout */}
-          <div style={{ display: "flex", gap: 10, justifySelf: "end", alignItems: "center" }}>
+          {/* Buttons (right) — Home + My Channel + Create/Login/Logout */}
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              justifySelf: "end",
+              alignItems: "center",
+            }}
+          >
+            {/* UPDATED: Home button with bold white text, bigger font */}
             <Link
               href="/home"
-              className="px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all"
+              style={{
+                padding: "10px 20px",
+                borderRadius: 999,
+                border: "2px solid #FFD700",
+                background: "transparent",
+                color: "#FFFFFF",
+                fontWeight: 800,
+                fontSize: 16,
+                textDecoration: "none",
+              }}
             >
               Home
             </Link>
+
+            {/* UPDATED: My Channel button with bold white text, bigger font */}
+            <Link
+              href="/channel/sample?owner=1"
+              style={{
+                padding: "10px 20px",
+                borderRadius: 999,
+                border: "2px solid #FFD700",
+                background: "transparent",
+                color: "#FFFFFF",
+                fontWeight: 800,
+                fontSize: 16,
+                textDecoration: "none",
+              }}
+            >
+              My Channel
+            </Link>
+
             <CreateButton />
             <LoginLogoutButton />
           </div>
@@ -255,7 +313,8 @@ export default function HomePage() {
               outline: "none",
               background: "rgba(0,0,0,0.25)",
               color: ivory,
-              boxShadow: "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+              boxShadow:
+                "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
             }}
           />
         </div>
@@ -286,8 +345,12 @@ export default function HomePage() {
             </div>
 
             <div style={{ marginTop: 12 }}>
-              <div style={{ fontWeight: 700, color: ivory }}>Featured video</div>
-              <div style={{ opacity: 0.8, fontSize: 13 }}>A curated, high-quality pick.</div>
+              <div style={{ fontWeight: 700, color: ivory }}>
+                Featured video
+              </div>
+              <div style={{ opacity: 0.8, fontSize: 13 }}>
+                A curated, high-quality pick.
+              </div>
               <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
                 <button className="gold-button">Play</button>
                 <button className="gold-button-outline">Add to queue</button>
@@ -309,8 +372,22 @@ export default function HomePage() {
         {/* RIGHT: Social feed */}
         <aside>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <h2 style={{ fontWeight: 700, fontSize: 18, color: ivory }}>Social Feeds</h2>
-            <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+            <h2
+              style={{
+                fontWeight: 700,
+                fontSize: 18,
+                color: ivory,
+              }}
+            >
+              Social Feeds
+            </h2>
+            <div
+              style={{
+                marginLeft: "auto",
+                display: "flex",
+                gap: 10,
+              }}
+            >
               <Pill>Trending</Pill>
               <Pill>Following</Pill>
             </div>

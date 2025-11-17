@@ -1,6 +1,8 @@
 // app/creator-studio/page.tsx
 /* Server Component (no hooks) */
 
+import Link from "next/link";
+
 const BURGUNDY = "#7B0F24";
 const GOLD = "#FFD700";
 
@@ -57,67 +59,97 @@ function Card({ title, children, style }: CardProps) {
 
 export default function CreatorStudioHome() {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "2fr 1fr",
-        gap: 20,
-      }}
-    >
-      {/* Left column */}
-      <div style={{ display: "grid", gap: 20 }}>
-        <Card title="Overview" style={{ minHeight: 320 }}>
-          {/* placeholder */}
-          <div style={{ height: 260 }} />
-        </Card>
-
-        <div
+    <div>
+      {/* NEW: View Channel button (owner view of sample channel) */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 16,
+        }}
+      >
+        <Link
+          href="/channel/sample?owner=1"
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 20,
+            padding: "8px 18px",
+            borderRadius: 999,
+            border: `2px solid ${GOLD}`,
+            background: "#FFF9F0",
+            color: BURGUNDY,
+            fontWeight: 700,
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <Card title="Views" style={{ minHeight: 120 }}>
+          View Channel
+        </Link>
+      </div>
+
+      {/* Original grid layout (unchanged) */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "2fr 1fr",
+          gap: 20,
+        }}
+      >
+        {/* Left column */}
+        <div style={{ display: "grid", gap: 20 }}>
+          <Card title="Overview" style={{ minHeight: 320 }}>
+            {/* placeholder */}
+            <div style={{ height: 260 }} />
+          </Card>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 20,
+            }}
+          >
+            <Card title="Views" style={{ minHeight: 120 }}>
+              <div style={{ height: 70 }} />
+            </Card>
+            <Card title="Watch Time" style={{ minHeight: 120 }}>
+              <div style={{ height: 70 }} />
+            </Card>
+            <Card title="Recent Uploads" style={{ minHeight: 120 }}>
+              <div style={{ height: 70 }} />
+            </Card>
+            <Card title="Notifications / Activity" style={{ minHeight: 120 }}>
+              <div style={{ height: 70 }} />
+            </Card>
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div style={{ display: "grid", gap: 20 }}>
+          <Card title="Traffic Sources" style={{ minHeight: 320 }}>
+            {/* simple pie placeholder */}
+            <div
+              style={{
+                margin: "18px auto",
+                width: 220,
+                height: 220,
+                borderRadius: "50%",
+                border: `12px solid ${GOLD}`,
+                boxShadow:
+                  "inset 0 0 0 24px rgba(0,0,0,.35), 0 0 22px rgba(255,215,0,.25)",
+                background: BURGUNDY,
+              }}
+            />
+          </Card>
+
+          <Card title="Revenue" style={{ minHeight: 120 }}>
             <div style={{ height: 70 }} />
           </Card>
-          <Card title="Watch Time" style={{ minHeight: 120 }}>
-            <div style={{ height: 70 }} />
-          </Card>
-          <Card title="Recent Uploads" style={{ minHeight: 120 }}>
-            <div style={{ height: 70 }} />
-          </Card>
-          <Card title="Notifications / Activity" style={{ minHeight: 120 }}>
+
+          <Card title="AI Insights & Suggestions" style={{ minHeight: 120 }}>
             <div style={{ height: 70 }} />
           </Card>
         </div>
-      </div>
-
-      {/* Right column */}
-      <div style={{ display: "grid", gap: 20 }}>
-        <Card title="Traffic Sources" style={{ minHeight: 320 }}>
-          {/* simple pie placeholder */}
-          <div
-            style={{
-              margin: "18px auto",
-              width: 220,
-              height: 220,
-              borderRadius: "50%",
-              border: `12px solid ${GOLD}`,
-              boxShadow:
-                "inset 0 0 0 24px rgba(0,0,0,.35), 0 0 22px rgba(255,215,0,.25)",
-              background: BURGUNDY,
-            }}
-          />
-        </Card>
-
-        <Card title="Revenue" style={{ minHeight: 120 }}>
-          <div style={{ height: 70 }} />
-        </Card>
-
-        <Card title="AI Insights & Suggestions" style={{ minHeight: 120 }}>
-          <div style={{ height: 70 }} />
-        </Card>
       </div>
     </div>
   );

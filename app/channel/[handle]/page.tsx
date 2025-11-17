@@ -1,349 +1,426 @@
 // app/channel/[handle]/page.tsx
-"use client";
 
-import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
-export default function ChannelPage() {
-  // Preview owner controls by visiting: /channel/anything?owner=1
-  const search = useSearchParams();
-  const isOwner = useMemo(() => search.get("owner") === "1", [search]);
+const BURGUNDY = "#7B0F24";
+const GOLD = "#FFD700";
 
-  // Brand tokens
-  const burgundy = "#7B0F24";
-  const gold = "#FFD700";
-  const ivory = "#FFF9F0";
+type ChannelPageProps = {
+  params: { handle: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
 
-  // Channel image upload/preview (visible on both views)
-  const [channelImage, setChannelImage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+export default function ChannelPage({ params }: ChannelPageProps) {
+  const { handle } = params;
 
-  const onPickImage = () => fileInputRef.current?.click();
-  const onFileChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const url = URL.createObjectURL(f);
-    setChannelImage((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return url;
-    });
-    // TODO: persist to Firebase (Storage + Firestore)
-  };
+  const channelName = "Channel Name";
+  const subscribersLabel = "120 K subscribers";
 
   return (
-    <div style={{ minHeight: "100vh", background: burgundy, color: ivory }}>
-      {/* ===== Static header (two rows) ===== */}
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: BURGUNDY,
+        color: "white",
+        border: `3px solid ${GOLD}`,
+        boxSizing: "border-box",
+      }}
+    >
+      {/* ==================== TOP HEADER ==================== */}
       <header
         style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-          background: burgundy,
-          borderBottom: `1px solid ${gold}99`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "16px 80px",
+          borderBottom: `1px solid ${GOLD}`,
         }}
       >
-        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "18px 20px 10px" }}>
-          {/* Row 1: brand + right controls */}
-          <div
+        {/* Logo + text */}
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <img
+            src="/logo.png"
+            alt="Integrity Streaming Logo"
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 20,
-              minHeight: 84,
+              width: 80,
+              height: 80,
+              borderRadius: 12,
+              objectFit: "cover",
+              backgroundColor: "white",
+            }}
+          />
+          <h1
+            style={{
+              fontSize: 32,
+              fontWeight: 800,
+              color: GOLD,
+              margin: 0,
+              letterSpacing: 1,
+              fontStyle: "italic",
             }}
           >
-            {/* Brand: logo + styled title */}
-            <div style={{ display: "flex", alignItems: "center", gap: 24, flex: 1, minWidth: 0 }}>
-              <Image
-                src="/logo.png"
-                alt="Integrity Streaming logo"
-                width={420}
-                height={100}
-                priority
-                style={{ height: 76, width: "auto", display: "block" }}
-              />
-
-              {/* GOLD title styled like sample: 'Integrity' italic, shadowed */}
-              <div
-                aria-label="Integrity Streaming"
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: 8,
-                  color: gold,
-                  letterSpacing: 0.4,
-                  textShadow: "0 2px 0 #5c0616, 0 3px 6px rgba(0,0,0,0.35)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span style={{ fontSize: 36, fontWeight: 800, fontStyle: "italic" }}>
-                  Integrity
-                </span>
-                <span style={{ fontSize: 36, fontWeight: 800 }}>Streaming</span>
-              </div>
-            </div>
-
-            {/* Right-side buttons */}
-            <div style={{ display: "flex", gap: 12, alignItems: "center", flexShrink: 0 }}>
-              {isOwner ? (
-                <>
-                  <button
-                    style={{
-                      padding: "10px 18px",
-                      borderRadius: 18,
-                      border: `1px solid ${gold}B3`,
-                      color: "#fff",
-                      background: "transparent",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Edit Layout
-                  </button>
-                  <a
-                    href="/creator-studio"
-                    style={{
-                      padding: "10px 18px",
-                      borderRadius: 24,
-                      background: gold,
-                      color: "#000",
-                      fontWeight: 700,
-                      textDecoration: "none",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Creator Studio
-                  </a>
-                  <button
-                    style={{
-                      padding: "10px 18px",
-                      borderRadius: 18,
-                      border: `1px solid ${gold}B3`,
-                      color: "#fff",
-                      background: "transparent",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Customize
-                  </button>
-                </>
-              ) : (
-                <button
-                  style={{
-                    padding: "10px 18px",
-                    borderRadius: 24,
-                    background: gold,
-                    color: "#000",
-                    fontWeight: 700,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  SUBSCRIBE
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Row 2: tabs */}
-          <nav style={{ marginTop: 10, borderTop: `1px solid ${gold}66`, paddingTop: 10 }}>
-            <ul
-              style={{
-                listStyle: "none",
-                display: "flex",
-                gap: 32,
-                margin: 0,
-                padding: 0,
-                fontSize: 20,
-                alignItems: "center",
-                whiteSpace: "nowrap",
-              }}
-            >
-              <li>Home</li>
-              <li>Videos</li>
-              <li>Shorts</li>
-              <li>Playlists</li>
-              <li>About</li>
-              {isOwner && <li>Analytics</li>}
-            </ul>
-          </nav>
+            Integrity Streaming
+          </h1>
         </div>
+
+        {/* RIGHT BUTTONS: Home / Edit Layout / Creator Studio / Customize */}
+        <nav style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Home – main homepage */}
+          <Link
+            href="/home"
+            style={{
+              padding: "10px 26px",
+              borderRadius: 999,
+              border: `1px solid ${GOLD}`,
+              backgroundColor: BURGUNDY,
+              color: "white",
+              fontWeight: 700,
+              textDecoration: "none",
+              fontSize: 15,
+            }}
+          >
+            Home
+          </Link>
+
+          {/* Edit Layout – goes to edit-layout page */}
+          <Link
+            href={`/channel/${handle}/edit-layout`}
+            style={{
+              padding: "10px 26px",
+              borderRadius: 999,
+              border: `1px solid ${GOLD}`,
+              backgroundColor: BURGUNDY,
+              color: "white",
+              fontWeight: 700,
+              textDecoration: "none",
+              fontSize: 15,
+            }}
+          >
+            Edit Layout
+          </Link>
+
+          {/* Creator Studio */}
+          <Link
+            href="/creator-studio"
+            style={{
+              padding: "10px 26px",
+              borderRadius: 999,
+              border: `1px solid ${GOLD}`,
+              backgroundColor: GOLD,
+              color: BURGUNDY,
+              fontWeight: 800,
+              textDecoration: "none",
+              fontSize: 15,
+            }}
+          >
+            Creator Studio
+          </Link>
+
+          {/* Customize */}
+          <Link
+            href={`/channel/${handle}/customize`}
+            style={{
+              padding: "10px 26px",
+              borderRadius: 999,
+              border: `1px solid ${GOLD}`,
+              backgroundColor: BURGUNDY,
+              color: "white",
+              fontWeight: 700,
+              textDecoration: "none",
+              fontSize: 15,
+            }}
+          >
+            Customize
+          </Link>
+        </nav>
       </header>
 
-      {/* ===== Channel header ===== */}
-      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "32px 16px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          {/* Circle avatar with centered content + centered Edit button */}
+      {/* ==================== CHANNEL TABS ROW ==================== */}
+      <div
+        style={{
+          padding: "0 40px",
+          borderBottom: `1px solid ${GOLD}`,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: 32,
+            padding: "18px 0",
+            fontWeight: 700,
+            fontSize: 18,
+          }}
+        >
+          <span style={{ color: GOLD }}>Home</span>
+          <span>Videos</span>
+          <span>Shorts</span>
+          <span>Playlists</span>
+          <span>About</span>
+          <span>Analytics</span>
+        </div>
+      </div>
+
+      {/* ==================== MAIN CHANNEL CONTENT ==================== */}
+      <main
+        style={{
+          padding: "32px 40px 60px 40px",
+          maxWidth: 1200,
+          margin: "0 auto",
+        }}
+      >
+        {/* Channel header section */}
+        <section
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 40,
+            marginBottom: 40,
+          }}
+        >
+          {/* Channel image circle */}
           <div
             style={{
-              position: "relative",
-              width: 144,
-              height: 144,
+              width: 180,
+              height: 180,
               borderRadius: "50%",
-              border: `1px solid ${gold}CC`,
-              overflow: "hidden",
-              background: "rgba(0,0,0,0.15)",
+              border: `3px solid ${GOLD}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              textAlign: "center",
+              position: "relative",
             }}
           >
-            {channelImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={channelImage}
-                alt="Channel image"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            ) : (
-              <span
-                style={{
-                  fontSize: 12,
-                  lineHeight: "16px",
-                  fontWeight: 700,
-                  color: gold,
-                  pointerEvents: "none",
-                }}
-              >
-                CHANNEL
-                <br />
-                IMAGE
-              </span>
-            )}
+            <span
+              style={{
+                fontWeight: 800,
+                textAlign: "center",
+                fontSize: 16,
+                lineHeight: 1.4,
+              }}
+            >
+              CHANNEL
+              <br />
+              IMAGE
+            </span>
 
-            {/* Centered “Edit” button */}
             <button
-              onClick={onPickImage}
-              aria-label="Edit channel image"
-              title="Edit channel image"
+              type="button"
               style={{
                 position: "absolute",
+                bottom: 16,
                 left: "50%",
                 transform: "translateX(-50%)",
-                bottom: 10,
-                padding: "6px 12px",
-                borderRadius: 14,
-                background: gold,
-                color: "#000",
-                fontWeight: 800,
-                fontSize: 12,
+                padding: "6px 18px",
+                borderRadius: 999,
                 border: "none",
+                backgroundColor: GOLD,
+                color: BURGUNDY,
+                fontWeight: 800,
                 cursor: "pointer",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.35)",
+                fontSize: 13,
               }}
             >
               Edit
             </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={onFileChange}
-              style={{ display: "none" }}
-            />
           </div>
 
+          {/* Channel text info */}
           <div>
-            <h2 style={{ fontSize: 36, fontWeight: 800, color: gold, margin: 0 }}>
-              Channel Name
+            <h2
+              style={{
+                fontSize: 36,
+                fontWeight: 800,
+                color: GOLD,
+                marginBottom: 8,
+              }}
+            >
+              {channelName}
             </h2>
-            <p style={{ marginTop: 8, fontSize: 18, opacity: 0.9 }}>120 K subscribers</p>
+            <p
+              style={{
+                fontSize: 16,
+                opacity: 0.95,
+                marginBottom: 8,
+              }}
+            >
+              {subscribersLabel}
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== Videos row ===== */}
-      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "0 16px 32px" }}>
-        <h3 style={{ fontSize: 24, fontWeight: 800, color: gold, margin: "0 0 16px" }}>
-          Videos
-        </h3>
+        {/* VIDEOS ROW */}
+        <section style={{ marginBottom: 40 }}>
+          <h3
+            style={{
+              fontSize: 24,
+              fontWeight: 800,
+              color: GOLD,
+              marginBottom: 18,
+            }}
+          >
+            Videos
+          </h3>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+              gap: 20,
+            }}
+          >
+            {Array.from({ length: 4 }).map((_, index) => (
+              <VideoCard key={`video-${index}`} />
+            ))}
+          </div>
+        </section>
+
+        {/* SHORTS ROW */}
+        <section>
+          <h3
+            style={{
+              fontSize: 24,
+              fontWeight: 800,
+              color: GOLD,
+              marginBottom: 18,
+            }}
+          >
+            Shorts
+          </h3>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+              gap: 20,
+            }}
+          >
+            {Array.from({ length: 6 }).map((_, index) => (
+              <ShortCard key={`short-${index}`} />
+            ))}
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+/* ==================== CARD COMPONENTS ==================== */
+
+function VideoCard() {
+  const GOLD = "#FFD700";
+
+  return (
+    <div
+      style={{
+        borderRadius: 18,
+        border: `1px solid rgba(255,215,0,0.7)`,
+        padding: 14,
+        background:
+          "linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.55))",
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+      }}
+    >
+      <div
+        style={{
+          borderRadius: 14,
+          border: `1px solid rgba(255,215,0,0.9)`,
+          height: 140,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-            gap: 20,
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            border: `3px solid ${GOLD}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 20,
           }}
         >
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                borderRadius: 12,
-                border: `1px solid ${gold}66`,
-                background: "rgba(0,0,0,0.2)",
-                padding: 16,
-              }}
-            >
-              <div
-                style={{
-                  aspectRatio: "16 / 9",
-                  width: "100%",
-                  borderRadius: 10,
-                  background: "rgba(0,0,0,0.3)",
-                  border: `1px solid ${gold}4D`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span style={{ fontSize: 28 }}>▶</span>
-              </div>
-              <div style={{ marginTop: 12 }}>
-                <p style={{ fontWeight: 600, margin: 0 }}>Video Title</p>
-                <p style={{ fontSize: 13, opacity: 0.9, margin: 0 }}>1.2K views · 6 days ago</p>
-              </div>
-            </div>
-          ))}
+          ▶
         </div>
-      </section>
+      </div>
 
-      {/* ===== Shorts row (styled like Videos, but 9:16) ===== */}
-      <section style={{ maxWidth: 1120, margin: "0 auto", padding: "0 16px 48px" }}>
-        <h3 style={{ fontSize: 24, fontWeight: 800, color: gold, margin: "0 0 16px" }}>
-          Shorts
-        </h3>
+      <div>
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
-            gap: 20,
+            fontWeight: 700,
+            marginBottom: 4,
           }}
         >
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                borderRadius: 12,
-                border: `1px solid ${gold}66`,
-                background: "rgba(0,0,0,0.2)",
-                padding: 16,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div
-                style={{
-                  aspectRatio: "9 / 16",
-                  width: "100%",
-                  borderRadius: 10,
-                  background: "rgba(0,0,0,0.3)",
-                  border: `1px solid ${gold}4D`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <span style={{ fontSize: 28 }}>▶</span>
-              </div>
-              <div style={{ marginTop: 12 }}>
-                <p style={{ fontWeight: 600, margin: 0 }}>Shorts Title</p>
-                <p style={{ fontSize: 13, opacity: 0.9, margin: 0 }}>12K views · 3 days ago</p>
-              </div>
-            </div>
-          ))}
+          Video Title
         </div>
-      </section>
+        <div style={{ fontSize: 12, opacity: 0.9 }}>
+          1.2K views · 6 days ago
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShortCard() {
+  const GOLD = "#FFD700";
+
+  return (
+    <div
+      style={{
+        borderRadius: 18,
+        border: `1px solid rgba(255,215,0,0.7)`,
+        padding: 10,
+        background:
+          "linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.55))",
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+      }}
+    >
+      <div
+        style={{
+          borderRadius: 14,
+          border: `1px solid rgba(255,215,0,0.9)`,
+          height: 160,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "50%",
+            border: `3px solid ${GOLD}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 18,
+          }}
+        >
+          ▶
+        </div>
+      </div>
+
+      <div>
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: 13,
+            marginBottom: 2,
+          }}
+        >
+          Short Title
+        </div>
+        <div style={{ fontSize: 11, opacity: 0.9 }}>
+          2.3K views · 3 days ago
+        </div>
+      </div>
     </div>
   );
 }
