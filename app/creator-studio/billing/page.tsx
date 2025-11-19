@@ -1,107 +1,76 @@
-"use client";
+// app/creator-studio/billing/page.tsx
 
+import BillingOverview from "./_components/BillingOverview";
+import UpgradePlanCard from "./_components/UpgradePlanCard";
+import PaymentMethodsTable from "./_components/PaymentMethodsTable";
+import InvoicesTable from "./_components/InvoicesTable";
+import { mockBillingSummary } from "./_components/billingData";
 import Link from "next/link";
 
+const GOLD = "#FFD700";
+
 export default function BillingPage() {
-  const burgundy = "#7B0F24";
-  const gold = "#FFD700";
-  const ivory = "#FFF9F0";
+  const summary = mockBillingSummary;
 
   return (
-    <div style={{ minHeight: "100vh", background: burgundy, color: ivory, padding: "24px 20px" }}>
-      <header style={{ maxWidth: 1200, margin: "0 auto 16px" }}>
-        <h1
-          style={{
-            margin: 0,
-            color: gold,
-            fontWeight: 800,
-            letterSpacing: 0.4,
-            textShadow: "0 2px 0 #5c0616, 0 3px 6px rgba(0,0,0,0.35)",
-          }}
-        >
-          Billing
-        </h1>
-        <nav style={{ marginTop: 8, display: "flex", gap: 12 }}>
-          <Link href="/creator-studio" style={{ color: gold, textDecoration: "none" }}>
-            Dashboard
-          </Link>
-          <Link href="/creator-studio/settings" style={{ color: gold, textDecoration: "none" }}>
-            Settings
-          </Link>
-        </nav>
-      </header>
+    <div
+      style={{
+        padding: "32px 24px 40px",
+        color: "white",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+        }}
+      >
+        {/* Page title + breadcrumb tabs */}
+        <div style={{ marginBottom: 16 }}>
+          <h1
+            style={{
+              fontSize: 36,
+              fontWeight: 800,
+              color: GOLD,
+              marginBottom: 4,
+            }}
+          >
+            Billing
+          </h1>
+          <div style={{ display: "flex", gap: 16, fontSize: 16 }}>
+            <span style={{ fontWeight: 700, textDecoration: "underline" }}>
+              Dashboard
+            </span>
+            <Link
+              href="/creator-studio/settings"
+              style={{
+                fontWeight: 600,
+                textDecoration: "none",
+                color: "white",
+                opacity: 0.9,
+              }}
+            >
+              Settings
+            </Link>
+          </div>
+        </div>
 
-      <main style={{ maxWidth: 1200, margin: "0 auto" }}>
-        {/* Overview */}
-        <section
-          style={{
-            border: `1px solid ${gold}66`,
-            borderRadius: 14,
-            padding: 20,
-            background: "rgba(0,0,0,0.18)",
-          }}
-        >
-          <h2 style={{ marginTop: 0, color: gold, fontWeight: 800 }}>Overview</h2>
-          <p style={{ opacity: 0.95 }}>
-            Billing placeholder. We’ll connect Stripe for subscriptions and payouts here.
-          </p>
-        </section>
+        {/* Overview box */}
+        <BillingOverview summary={summary} />
 
-        {/* Cards */}
-        <section
+        {/* Three-card row */}
+        <div
           style={{
-            marginTop: 20,
-            display: "grid",
+            display: "flex",
+            flexWrap: "wrap",
             gap: 16,
-            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
           }}
         >
-          <div
-            style={{
-              border: `1px solid ${gold}66`,
-              borderRadius: 14,
-              padding: 16,
-              background: "rgba(0,0,0,0.12)",
-            }}
-          >
-            <div style={{ color: gold, fontWeight: 700, marginBottom: 6 }}>Current Plan</div>
-            <div style={{ fontSize: 20, fontWeight: 800 }}>Creator — $0 / mo</div>
-            <div style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>
-              Change/upgrade will go here.
-            </div>
-          </div>
-
-          <div
-            style={{
-              border: `1px solid ${gold}66`,
-              borderRadius: 14,
-              padding: 16,
-              background: "rgba(0,0,0,0.12)",
-            }}
-          >
-            <div style={{ color: gold, fontWeight: 700, marginBottom: 6 }}>Payment Method</div>
-            <div style={{ fontSize: 14, opacity: 0.95 }}>•••• •••• •••• 4242</div>
-            <div style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>
-              Update card modal later.
-            </div>
-          </div>
-
-          <div
-            style={{
-              border: `1px solid ${gold}66`,
-              borderRadius: 14,
-              padding: 16,
-              background: "rgba(0,0,0,0.12)",
-            }}
-          >
-            <div style={{ color: gold, fontWeight: 700, marginBottom: 6 }}>Invoices</div>
-            <div style={{ fontSize: 14, opacity: 0.95 }}>No invoices yet.</div>
-            <div style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>
-              We’ll show downloadable PDFs here.
-            </div>
-          </div>
-        </section>
-      </main>
+          <UpgradePlanCard plan={summary.plan} />
+          <PaymentMethodsTable paymentMethod={summary.paymentMethod} />
+          <InvoicesTable invoices={summary.invoices} />
+        </div>
+      </div>
     </div>
   );
 }

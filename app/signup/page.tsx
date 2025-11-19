@@ -1,10 +1,14 @@
-// C:\Users\rcwoo\integrity-streaming\app\signup\page.tsx
+// app/signup/page.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import Link from "next/link";
 
 export default function SignupPage() {
@@ -17,13 +21,35 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      if (auth.currentUser) {
-        await updateProfile(auth.currentUser, { displayName: name });
-      }
+      // 1) Create the Firebase Auth user
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // 2) Set the displayName on the Auth user
+      await updateProfile(user, { displayName: name });
+
+      // 3) Create a Firestore user document with account info
+      //    This is what the Settings -> Account page will read & update.
+      const userDocRef = doc(db, "users", user.uid);
+      await setDoc(userDocRef, {
+        displayName: name,
+        email,
+        // sensible defaults - we can let the user change these in Settings
+        language: "en-US",
+        country: "US",
+        createdAt: serverTimestamp(),
+      });
+
+      // 4) Redirect into the app
       router.push("/home");
     } catch (err: any) {
+      console.error("Signup failed:", err);
       setError("Signup failed. Please try again.");
     }
   };
@@ -35,10 +61,12 @@ export default function SignupPage() {
         style={{
           paddingLeft: "1in",
           paddingRight: "1in",
-          paddingBottom: "1in", // <-- added space under the button before the gold line
+          paddingBottom: "1in",
         }}
       >
-        <h1 className="text-3xl font-bold text-[#FFD700] mb-6">Create Account</h1>
+        <h1 className="text-3xl font-bold text-[#FFD700] mb-6">
+          Create Account
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
