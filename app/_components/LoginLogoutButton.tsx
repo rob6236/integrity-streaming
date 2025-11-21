@@ -1,34 +1,54 @@
 "use client";
 
+import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useAuth } from "@/lib/useAuth"; // <-- named import
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
-const btn =
-  "px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all";
+const pillStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "6px 18px",
+  borderRadius: 999,
+  border: "2px solid #FFD700", // gold
+  background: "#7B0F24", // burgundy
+  color: "#FFFFFF", // white text
+  fontWeight: 800,
+  fontSize: 14,
+  lineHeight: 1,
+  textDecoration: "none",
+  boxShadow:
+    "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+  cursor: "pointer",
+  whiteSpace: "nowrap",
+};
 
 export default function LoginLogoutButton() {
-  const { user, loading } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
-  if (loading) {
-    return (
-      <button className={btn} aria-busy="true" aria-label="Loading">
-        …
-      </button>
-    );
-  }
+  // Watch auth state without react-firebase-hooks
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user);
+    });
+    return () => unsub();
+  }, []);
 
-  if (user) {
+  // LOGOUT pill (when signed in)
+  if (isLoggedIn) {
     return (
       <button
-        className={btn}
+        type="button"
+        style={pillStyle}
         onClick={async () => {
           try {
             await signOut(auth);
-          } finally {
-            router.refresh(); // update header immediately
+            router.push("/home");
+          } catch (err) {
+            console.error("Error signing out", err);
           }
         }}
       >
@@ -37,8 +57,13 @@ export default function LoginLogoutButton() {
     );
   }
 
+  // LOGIN pill (when signed out)
   return (
-    <button className={btn} onClick={() => router.push("/login")}>
+    <button
+      type="button"
+      style={pillStyle}
+      onClick={() => router.push("/login")}
+    >
       Login
     </button>
   );

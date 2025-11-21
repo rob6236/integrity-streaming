@@ -6,85 +6,153 @@
 @tailwind utilities;
 
 /* Theme */
-:root{
-  --burgundy:#7B0F24;
-  --gold:#FFD700;
-  --text:#fff;
+:root {
+  --burgundy: #7B0F24;
+  --gold: #FFD700;
+  --text: #fff;
 }
 
 /* Base */
-*{box-sizing:border-box}
-html,body,#__next{height:100%}
-body{
-  margin:0;
-  background:var(--burgundy);
-  color:var(--text);
-  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-  line-height:1.5;
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#__next {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--burgundy);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+  line-height: 1.5;
 }
 
 /* Thin gold border */
-body::before{
-  content:"";
-  position:fixed; inset:0;
-  border:2px solid var(--gold);
-  border-radius:10px;
-  pointer-events:none;
-  z-index:9999;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 9999;
 }
 
-/* ONE button style to use everywhere */
-.btn{
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
+/* =========================================================
+   UNIVERSAL HEADER WRAPPER: .header-shell
+   Keeps big header between smileys and responsive
+   ========================================================= */
 
-  background:#fff !important;
-  color:#111 !important;
-  border:1px solid var(--gold) !important;
-  border-radius:12px !important;
-
-  padding:12px 24px !important;
-  font-size:20px !important;
-  font-weight:900 !important;
-  line-height:1 !important;
-  text-decoration:none !important;
-
-  box-shadow:0 2px 0 rgba(0,0,0,.35) !important;
-  transition:background .2s ease, box-shadow .2s ease !important;
+.header-shell {
+  display: block !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-inline: 12px !important;
 }
-.btn:hover{ background:#fff3c4 !important }
 
-/* SAFETY NET: if the Login link has no class, style by href */
-a[href*="/login" i]{
-  composes: btn;
-  /* If your build doesn’t support `composes`, duplicate the .btn rules: */
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  background:#fff !important;
-  color:#111 !important;
-  border:1px solid var(--gold) !important;
-  border-radius:12px !important;
-  padding:12px 24px !important;
-  font-size:20px !important;
-  font-weight:900 !important;
-  line-height:1 !important;
-  text-decoration:none !important;
-  box-shadow:0 2px 0 rgba(0,0,0,.35) !important;
-  transition:background .2s ease, box-shadow .2s ease !important;
+/* Mobile */
+@media (max-width: 639px) {
+  .header-shell {
+    max-width: calc(100vw - 40px) !important; /* 20px margin each side */
+  }
 }
-a[href*="/login" i]:hover{ background:#fff3c4 !important }
-/* === Make 'Create an account' visible and gold === */
+
+/* Tablet */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .header-shell {
+    max-width: 780px !important; /* pulls header in on iPad/tablet */
+  }
+}
+
+/* Desktop & larger (most laptops / monitors) */
+@media (min-width: 1024px) {
+  .header-shell {
+    max-width: 1100px !important; /* keeps your current desktop look */
+  }
+}
+
+/* Generic white button (not used for header pills but kept for reuse) */
+.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: #fff !important;
+  color: #111 !important;
+  border: 1px solid var(--gold) !important;
+  border-radius: 12px !important;
+
+  padding: 12px 24px !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35) !important;
+  transition: background 0.2s ease, box-shadow 0.2s ease !important;
+}
+.btn:hover {
+  background: #fff3c4 !important;
+}
+
+/* =========================================================
+   LOGIN pill – match My Channel (burgundy with white text)
+   ========================================================= */
+a[href*="/login" i] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: #7b0f24 !important; /* burgundy */
+  color: #ffffff !important; /* white text */
+  border: 2px solid var(--gold) !important;
+  border-radius: 999px !important;
+
+  padding: 6px 14px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.6),
+    0 0 10px rgba(255, 215, 0, 0.18) !important;
+  transition: background 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+a[href*="/login" i]:hover {
+  background: #8f1630 !important; /* slightly lighter burgundy */
+}
+
+/* =========================================================
+   CREATE / SIGNUP pills – match My Channel style
+   ========================================================= */
 a[href*="signup" i],
 a[href*="register" i],
 a[href*="create-account" i],
 a[href*="create" i],
 a[href*="account" i] {
-  color: #FFD700 !important;          /* bright gold text */
-  font-weight: 700 !important;        /* bold */
-  text-decoration: underline !important;
-  font-size: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: #7b0f24 !important; /* burgundy */
+  color: #ffffff !important; /* white text */
+  border: 2px solid var(--gold) !important;
+  border-radius: 999px !important;
+
+  padding: 6px 14px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+
+  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.6),
+    0 0 10px rgba(255, 215, 0, 0.18) !important;
+  transition: background 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 a[href*="signup" i]:hover,
@@ -92,7 +160,7 @@ a[href*="register" i]:hover,
 a[href*="create-account" i]:hover,
 a[href*="create" i]:hover,
 a[href*="account" i]:hover {
-  color: #fff3c4 !important;          /* lighter gold hover */
+  background: #8f1630 !important;
 }
 
 /* === Auth Page Padding (1 inch left & right) === */
@@ -101,10 +169,29 @@ a[href*="account" i]:hover {
   padding-right: 1in;
 }
 
-/* Force the header title to gold on all pages, without touching other text */
+/* Force the header title to gold on all pages */
 header h1 {
-  color: #FFD700 !important;
+  color: #ffd700 !important;
   font-style: italic;
   font-weight: 800;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* =========================================================
+   HOME PAGE MAIN GRID (Featured video + Social Feeds)
+   Desktop: 2 columns
+   Tablet/Mobile: stacked 1 column
+   ========================================================= */
+
+.home-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.2fr);
+  gap: 24px;
+}
+
+/* Tablet & smaller: stack vertically */
+@media (max-width: 1024px) {
+  .home-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

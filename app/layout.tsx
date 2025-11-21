@@ -1,7 +1,18 @@
 // app/layout.tsx
 import type { ReactNode } from "react";
-import SmileyOverlay from "./_components/SmileyOverlay"; // <-- uses the file you created
-import "./globals.css"; // keep if you already have global styles
+import SmileyOverlay from "./_components/SmileyOverlay";
+import "./globals.css";
+
+// This is the <meta name="viewport" ...> equivalent for the App Router
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
+export const metadata = {
+  title: "Integrity Streaming",
+  description: "Creator-first video platform.",
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -10,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Global smileys on every page */}
         <SmileyOverlay />
 
-        {/* Your app content */}
+        {/* All page content sits inside the burgundy background + gold border */}
         {children}
       </body>
     </html>

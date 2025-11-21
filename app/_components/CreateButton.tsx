@@ -1,23 +1,35 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/useAuth';
+import { useRouter } from "next/navigation";
+import type { CSSProperties } from "react";
 
-const btn =
-  "px-5 py-2 rounded-md border-[1.5px] border-[--gold] bg-white text-black font-semibold shadow-sm hover:shadow transition";
+const pillStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "6px 18px",
+  borderRadius: 999,
+  border: "2px solid #FFD700", // gold
+  background: "#7B0F24",       // burgundy
+  color: "#FFFFFF",            // white text
+  fontWeight: 800,
+  fontSize: 14,
+  lineHeight: 1,
+  textDecoration: "none",
+  boxShadow:
+    "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+  cursor: "pointer",
+};
 
 export default function CreateButton() {
-  // If you have a loading state, you can use it, but we won’t block navigation
-  const { /* user, loading */ } = useAuth();
   const router = useRouter();
 
-  const go = () => {
-    // Let the /creator-studio page enforce auth (via RequireAuth)
-    router.push('/creator-studio');
-  };
-
   return (
-    <button className={btn} onClick={go}>
+    <button
+      type="button"
+      onClick={() => router.push("/creator-studio")}
+      style={pillStyle}
+    >
       Create
     </button>
   );

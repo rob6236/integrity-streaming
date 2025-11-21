@@ -1,7 +1,8 @@
-// app/home/page.tsx
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import CreateButton from "@/app/_components/CreateButton";
 import LoginLogoutButton from "@/app/_components/LoginLogoutButton";
 
@@ -191,26 +192,28 @@ function FeedCard({
 
 /* ---- Page ---- */
 export default function HomePage() {
+  // Mobile-only toggle: which body content is visible
+  const [mobileTab, setMobileTab] = useState<"videos" | "social">("videos");
+
+  const videoSectionClass =
+    mobileTab === "videos" ? "block md:block" : "hidden md:block";
+  const socialSectionClass =
+    mobileTab === "social" ? "block md:block" : "hidden md:block";
+
   return (
     <main className="mx-auto w-full max-w-[1200px] px-4 md:px-6 pb-16">
-      {/* HEADER */}
-      <div
-        style={goldOutline({
-          background: "transparent",
-          padding: 16,
-          marginTop: 16,
-        })}
-      >
+      {/* HEADER in a centered shell between smileys */}
+      <div className="header-shell">
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "auto 1fr auto",
-            alignItems: "center",
-            gap: 16,
-          }}
+          style={goldOutline({
+            background: "transparent",
+            padding: 20,
+            marginTop: 16,
+            textAlign: "center",
+          })}
         >
-          {/* Logo (left) */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {/* Logo */}
+          <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}>
             <div
               style={{
                 width: 110,
@@ -242,7 +245,7 @@ export default function HomePage() {
           {/* Title */}
           <h1
             id="isHeaderTitle"
-            className="text-center text-[40px] md:text-[44px] leading-none"
+            className="text-[36px] md:text-[44px] leading-none"
             style={{
               color: "#FFD700",
               fontStyle: "italic",
@@ -253,44 +256,30 @@ export default function HomePage() {
             Integrity <span style={{ fontStyle: "normal" }}>Streaming</span>
           </h1>
 
-          {/* Buttons (right) — Home + My Channel + Create/Login/Logout */}
+          {/* Buttons row */}
           <div
             style={{
+              marginTop: 18,
               display: "flex",
-              gap: 10,
-              justifySelf: "end",
-              alignItems: "center",
+              justifyContent: "center",
+              gap: 12, // space between My Channel / Create / Login-Logout
+              flexWrap: "wrap",
             }}
           >
-            {/* UPDATED: Home button with bold white text, bigger font */}
-            <Link
-              href="/home"
-              style={{
-                padding: "10px 20px",
-                borderRadius: 999,
-                border: "2px solid #FFD700",
-                background: "transparent",
-                color: "#FFFFFF",
-                fontWeight: 800,
-                fontSize: 16,
-                textDecoration: "none",
-              }}
-            >
-              Home
-            </Link>
-
-            {/* UPDATED: My Channel button with bold white text, bigger font */}
             <Link
               href="/channel/sample?owner=1"
               style={{
-                padding: "10px 20px",
+                padding: "10px 24px",
                 borderRadius: 999,
                 border: "2px solid #FFD700",
-                background: "transparent",
+                background: "#7B0F24",
                 color: "#FFFFFF",
                 fontWeight: 800,
                 fontSize: 16,
                 textDecoration: "none",
+                boxShadow:
+                  "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+                whiteSpace: "nowrap",
               }}
             >
               My Channel
@@ -300,37 +289,96 @@ export default function HomePage() {
             <LoginLogoutButton />
           </div>
         </div>
+      </div>
 
-        {/* Search (centered under header) */}
-        <div style={{ marginTop: 14, display: "grid", placeItems: "center" }}>
-          <input
-            placeholder="Search videos, channels, topics..."
+      {/* SEARCH BAR – padded away from header and toggle */}
+      <div
+        style={{
+          marginTop: 20,
+          marginBottom: 20,
+          display: "grid",
+          placeItems: "center",
+        }}
+      >
+        <input
+          placeholder="Search videos, channels, topics..."
+          style={{
+            width: "min(680px, 100%)",
+            borderRadius: 12,
+            border: `1px solid ${gold}`,
+            padding: "12px 14px",
+            outline: "none",
+            background: "rgba(0,0,0,0.25)",
+            color: ivory,
+            boxShadow:
+              "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+          }}
+        />
+      </div>
+
+      {/* MOBILE-ONLY TOGGLE (videos / social feeds) */}
+      <div className="flex justify-center md:hidden" style={{ marginBottom: 24 }}>
+        <div
+          style={goldOutline({
+            display: "inline-flex",
+            padding: 4,
+            borderRadius: 999,
+            background: "rgba(0,0,0,0.35)",
+            gap: 8, // space between Videos & Social Feeds buttons
+          })}
+        >
+          <button
+            type="button"
+            onClick={() => setMobileTab("videos")}
             style={{
-              width: "min(680px, 100%)",
-              borderRadius: 12,
-              border: `1px solid ${gold}`,
-              padding: "12px 14px",
-              outline: "none",
-              background: "rgba(0,0,0,0.25)",
-              color: ivory,
-              boxShadow:
-                "0 0 0 1px rgba(255,215,0,0.6), 0 0 10px rgba(255,215,0,0.18)",
+              padding: "8px 18px",
+              borderRadius: 999,
+              border:
+                mobileTab === "videos"
+                  ? "2px solid #FFD700"
+                  : "1px solid rgba(255,215,0,0.3)",
+              background:
+                mobileTab === "videos" ? "#FFD700" : "rgba(0,0,0,0.25)",
+              color: mobileTab === "videos" ? "#7B0F24" : "#FFF9F0",
+              fontWeight: 800,
+              fontSize: 15,
+              minWidth: 110,
             }}
-          />
+          >
+            Videos
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab("social")}
+            style={{
+              padding: "8px 18px",
+              borderRadius: 999,
+              border:
+                mobileTab === "social"
+                  ? "2px solid #FFD700"
+                  : "1px solid rgba(255,215,0,0.3)",
+              background:
+                mobileTab === "social" ? "#FFD700" : "rgba(0,0,0,0.25)",
+              color: mobileTab === "social" ? "#7B0F24" : "#FFF9F0",
+              fontWeight: 800,
+              fontSize: 15,
+              minWidth: 130,
+            }}
+          >
+            Social Feeds
+          </button>
         </div>
       </div>
 
-      {/* TWO-COLUMN BODY */}
+      {/* BODY – extra top margin so it's not tight under the toggle */}
       <div
+        className="mt-8 md:grid md:gap-6"
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 360px",
-          gap: 16,
-          marginTop: 20,
+          gridTemplateColumns: "minmax(0,1fr) 360px",
         }}
       >
         {/* LEFT: video sections */}
-        <section>
+        <section className={videoSectionClass}>
           {/* Featured */}
           <div style={goldOutline({ background: "transparent", padding: 14 })}>
             <div style={goldOutline({ background: "transparent", padding: 10 })}>
@@ -345,15 +393,14 @@ export default function HomePage() {
             </div>
 
             <div style={{ marginTop: 12 }}>
-              <div style={{ fontWeight: 700, color: ivory }}>
-                Featured video
-              </div>
+              <div style={{ fontWeight: 700, color: ivory }}>Featured video</div>
               <div style={{ opacity: 0.8, fontSize: 13 }}>
                 A curated, high-quality pick.
               </div>
               <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
                 <button className="gold-button">Play</button>
                 <button className="gold-button-outline">Add to queue</button>
+                <button className="gold-button-outline">Share</button>
               </div>
             </div>
           </div>
@@ -370,7 +417,7 @@ export default function HomePage() {
         </section>
 
         {/* RIGHT: Social feed */}
-        <aside>
+        <aside className={socialSectionClass}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <h2
               style={{

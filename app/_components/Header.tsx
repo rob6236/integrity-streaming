@@ -1,13 +1,14 @@
-// C:\Users\rcwoo\integrity-streaming\app\_components\Header.tsx
 "use client";
 
 import Link from "next/link";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [user] = useAuthState(auth);
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await auth.signOut();
@@ -15,6 +16,8 @@ export default function Header() {
 
   const buttonStyle =
     "px-5 py-2 rounded-md border-2 border-[#FFD700] bg-white text-black font-semibold shadow-sm hover:bg-[#FFD700] hover:text-black transition-all";
+
+  const isHomePage = pathname === "/home";
 
   return (
     <header className="w-full flex items-center justify-between px-8 py-4 border-b-2 border-[#FFD700] bg-[#7B0F24]">
@@ -36,12 +39,17 @@ export default function Header() {
 
       {/* Right: Navigation buttons */}
       <nav className="flex items-center gap-4">
-        <Link href="/home" className={buttonStyle}>
-          Home
-        </Link>
+        {/* Hide Home only when already on /home */}
+        {!isHomePage && (
+          <Link href="/home" className={buttonStyle}>
+            Home
+          </Link>
+        )}
+
         <Link href="/create" className={buttonStyle}>
           Create
         </Link>
+
         {user ? (
           <button onClick={handleLogout} className={buttonStyle}>
             Logout
