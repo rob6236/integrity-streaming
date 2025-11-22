@@ -7,8 +7,8 @@
 
 /* Theme */
 :root {
-  --burgundy: #7B0F24;
-  --gold: #FFD700;
+  --burgundy: #7b0f24;
+  --gold: #ffd700;
   --text: #fff;
 }
 
@@ -16,11 +16,13 @@
 * {
   box-sizing: border-box;
 }
+
 html,
 body,
 #__next {
   height: 100%;
 }
+
 body {
   margin: 0;
   background: var(--burgundy);
@@ -80,21 +82,19 @@ body::before {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-
   background: #fff !important;
   color: #111 !important;
   border: 1px solid var(--gold) !important;
   border-radius: 12px !important;
-
   padding: 12px 24px !important;
   font-size: 20px !important;
   font-weight: 900 !important;
   line-height: 1 !important;
   text-decoration: none !important;
-
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35) !important;
   transition: background 0.2s ease, box-shadow 0.2s ease !important;
 }
+
 .btn:hover {
   background: #fff3c4 !important;
 }
@@ -106,18 +106,15 @@ a[href*="/login" i] {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-
   background: #7b0f24 !important; /* burgundy */
   color: #ffffff !important; /* white text */
   border: 2px solid var(--gold) !important;
   border-radius: 999px !important;
-
   padding: 6px 14px !important;
   font-size: 14px !important;
   font-weight: 800 !important;
   line-height: 1 !important;
   text-decoration: none !important;
-
   box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.6),
     0 0 10px rgba(255, 215, 0, 0.18) !important;
   transition: background 0.2s ease, box-shadow 0.2s ease !important;
@@ -138,18 +135,15 @@ a[href*="account" i] {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-
   background: #7b0f24 !important; /* burgundy */
   color: #ffffff !important; /* white text */
   border: 2px solid var(--gold) !important;
   border-radius: 999px !important;
-
   padding: 6px 14px !important;
   font-size: 14px !important;
   font-weight: 800 !important;
   line-height: 1 !important;
   text-decoration: none !important;
-
   box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.6),
     0 0 10px rgba(255, 215, 0, 0.18) !important;
   transition: background 0.2s ease, box-shadow 0.2s ease !important;
@@ -193,5 +187,60 @@ header h1 {
 @media (max-width: 1024px) {
   .home-main-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Home page: shrink video & shorts placeholders on tablet and desktop only */
+@media (min-width: 768px) {
+  .home-video-placeholder {
+    max-width: 220px; /* shrink 16:9 boxes */
+  }
+
+  .home-short-placeholder {
+    max-width: 130px; /* shrink 9:16 boxes */
+  }
+}
+
+/* =========================================================
+   CHANNEL HEADER LOGO (size + tablet-only offset)
+   ========================================================= */
+
+.channel-header-logo-wrapper {
+  width: 80px;
+  height: 80px;
+}
+
+/* Tablet only: nudge logo to the right so it doesn't touch the smiley */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .channel-header-logo-wrapper {
+    margin-left: 48px; /* adjust higher/lower if you want more/less space */
+  }
+}
+
+/* =========================================================
+   CHANNEL HEADER LOGO (size + global offset)
+   ========================================================= */
+
+.channel-header-logo-wrapper {
+  width: 80px;
+  height: 80px;
+  display: block;
+  margin-left: 32px; /* moves logo right on ALL views so it's away from the smiley */
+}
+
+/* Mobile-only layout for channel header */
+@media (max-width: 639px) {
+  /* Stack logo + title + buttons vertically and center */
+  .channel-header-flex {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .channel-header-logo-wrapper {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    margin-bottom: 12px !important;
   }
 }
