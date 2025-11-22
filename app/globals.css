@@ -228,7 +228,10 @@ header h1 {
   margin-left: 32px; /* moves logo right on ALL views so it's away from the smiley */
 }
 
-/* Mobile-only layout for channel header */
+/* =========================================================
+   MOBILE-ONLY LAYOUT + CHANNEL NAV FIX
+   ========================================================= */
+
 @media (max-width: 639px) {
   /* Stack logo + title + buttons vertically and center */
   .channel-header-flex {
@@ -242,5 +245,19 @@ header h1 {
     top: auto !important;
     transform: none !important;
     margin-bottom: 12px !important;
+  }
+
+  /* Channel tabs row (Home / Videos / Shorts / Playlists / About / Analytics)
+     – shrink font a bit, reduce gap, and allow wrapping so ALL tabs stay
+     inside the screen on mobile. */
+  main > nav {
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    white-space: normal !important;
+    justify-content: center !important;
+  }
+
+  main > nav a {
+    font-size: 13px !important;
   }
 }

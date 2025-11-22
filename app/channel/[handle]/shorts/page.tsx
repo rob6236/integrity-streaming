@@ -1,4 +1,4 @@
-// app/channel/[handle]/page.tsx
+// app/channel/[handle]/shorts/page.tsx
 
 const BURGUNDY = "#7B0F24";
 const GOLD = "#FFD700";
@@ -42,9 +42,6 @@ function makeTabHref(
   return isOwnerView ? `${path}?owner=1` : path;
 }
 
-/**
- * Main Integrity Streaming header
- */
 function MainHeader({
   handle,
   isOwnerView,
@@ -87,7 +84,6 @@ function MainHeader({
           backgroundColor: BURGUNDY,
         }}
       >
-        {/* FLEX WRAPPER (mobile behavior handled in globals.css) */}
         <div
           className="channel-header-flex"
           style={{
@@ -97,7 +93,6 @@ function MainHeader({
             justifyContent: "center",
           }}
         >
-          {/* LOGO */}
           <div
             className="channel-header-logo-wrapper"
             style={{
@@ -126,7 +121,6 @@ function MainHeader({
             />
           </div>
 
-          {/* TITLE + BUTTONS */}
           <div
             style={{
               textAlign: "center",
@@ -174,10 +168,10 @@ function MainHeader({
   );
 }
 
-export default function ChannelPage({ params, searchParams }: PageProps) {
+export default function ChannelShortsPage({ params, searchParams }: PageProps) {
   const { handle } = params;
   const isOwnerView = searchParams?.owner === "1";
-  const activeTab = "Home";
+  const activeTab = "Shorts";
 
   const navTabs = isOwnerView
     ? ["Home", "Videos", "Shorts", "Playlists", "About", "Analytics"]
@@ -201,7 +195,6 @@ export default function ChannelPage({ params, searchParams }: PageProps) {
           padding: "0 16px 40px",
         }}
       >
-        {/* NAV TABS */}
         <nav
           style={{
             borderBottom: `2px solid ${GOLD}`,
@@ -232,202 +225,6 @@ export default function ChannelPage({ params, searchParams }: PageProps) {
           ))}
         </nav>
 
-        {/* CHANNEL HEADER AREA */}
-        <section
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 32,
-            alignItems: "center",
-            marginBottom: 32,
-          }}
-        >
-          {/* Channel image circle */}
-          <div
-            style={{
-              width: 210,
-              height: 210,
-              borderRadius: "50%",
-              border: `4px solid ${GOLD}`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              flexShrink: 0,
-            }}
-          >
-            <span
-              style={{
-                textAlign: "center",
-                fontWeight: 700,
-                fontSize: 16,
-                lineHeight: 1.3,
-              }}
-            >
-              CHANNEL
-              <br />
-              IMAGE
-            </span>
-
-            {isOwnerView && (
-              <button
-                type="button"
-                style={{
-                  position: "absolute",
-                  bottom: 18,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  padding: "6px 18px",
-                  backgroundColor: GOLD,
-                  color: BURGUNDY,
-                  borderRadius: 999,
-                  border: "none",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  boxShadow: "0 0 0 1px rgba(0, 0, 0, 0.3)",
-                }}
-              >
-                Edit
-              </button>
-            )}
-          </div>
-
-          {/* Channel text + actions */}
-          <div
-            style={{
-              flex: "1 1 260px",
-              minWidth: 260,
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 32,
-                fontWeight: 800,
-                margin: 0,
-                marginBottom: 8,
-                color: GOLD,
-              }}
-            >
-              Channel Name
-            </h2>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 16,
-                opacity: 0.9,
-              }}
-            >
-              120 K subscribers
-            </p>
-
-            {isOwnerView ? (
-              <>
-                <div
-                  style={{
-                    marginTop: 16,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    padding: "6px 14px",
-                    borderRadius: 999,
-                    border: `1px solid ${GOLD}`,
-                    background:
-                      "linear-gradient(90deg, rgba(255,215,0,0.15) 0%, rgba(255,215,0,0.05) 100%)",
-                    fontSize: 14,
-                    fontWeight: 600,
-                  }}
-                >
-                  Creator view · @{handle}
-                </div>
-
-                <div
-                  style={{
-                    marginTop: 18,
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                    gap: 12,
-                  }}
-                >
-                  <div
-                    style={{
-                      borderRadius: 14,
-                      border: `1px solid ${GOLD}`,
-                      padding: "10px 12px",
-                      fontSize: 12,
-                    }}
-                  >
-                    <div style={{ opacity: 0.8 }}>Videos</div>
-                    <div style={{ fontWeight: 800, fontSize: 18 }}>128</div>
-                  </div>
-                  <div
-                    style={{
-                      borderRadius: 14,
-                      border: `1px solid ${GOLD}`,
-                      padding: "10px 12px",
-                      fontSize: 12,
-                    }}
-                  >
-                    <div style={{ opacity: 0.8 }}>Watch time (hrs)</div>
-                    <div style={{ fontWeight: 800, fontSize: 18 }}>4.2K</div>
-                  </div>
-                  <div
-                    style={{
-                      borderRadius: 14,
-                      border: `1px solid ${GOLD}`,
-                      padding: "10px 12px",
-                      fontSize: 12,
-                    }}
-                  >
-                    <div style={{ opacity: 0.8 }}>Revenue (month)</div>
-                    <div style={{ fontWeight: 800, fontSize: 18 }}>$2,340</div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div
-                style={{
-                  marginTop: 16,
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 12,
-                }}
-              >
-                <button
-                  type="button"
-                  style={{
-                    padding: "8px 22px",
-                    borderRadius: 999,
-                    border: "none",
-                    backgroundColor: GOLD,
-                    color: BURGUNDY,
-                    fontWeight: 800,
-                    fontSize: 14,
-                    cursor: "pointer",
-                    boxShadow: "0 0 0 1px rgba(0, 0, 0, 0.35)",
-                  }}
-                >
-                  Subscribe
-                </button>
-                <button
-                  type="button"
-                  style={{
-                    padding: "8px 18px",
-                    borderRadius: 999,
-                    border: `1px solid ${GOLD}`,
-                    background: "transparent",
-                    color: TEXT,
-                    fontWeight: 600,
-                    fontSize: 14,
-                    cursor: "pointer",
-                  }}
-                >
-                  Share
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* HOME – FEATURED VIDEOS GRID (16:9) */}
         <section>
           <h3
             style={{
@@ -437,23 +234,24 @@ export default function ChannelPage({ params, searchParams }: PageProps) {
               color: GOLD,
             }}
           >
-            Videos
+            Shorts
           </h3>
 
+          {/* 9:16 PLACEHOLDERS, GRID WITH SEVERAL PER ROW */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
               gap: 24,
             }}
           >
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 16 }).map((_, i) => (
               <article
                 key={i}
                 style={{
                   borderRadius: 18,
                   border: `2px solid ${GOLD}`,
-                  padding: 16,
+                  padding: 12,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -466,19 +264,19 @@ export default function ChannelPage({ params, searchParams }: PageProps) {
                   style={{
                     borderRadius: 16,
                     border: `2px solid ${GOLD}`,
-                    padding: 12,
+                    padding: 8,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     position: "relative",
                     width: "100%",
-                    aspectRatio: "16 / 9",
+                    aspectRatio: "9 / 16",
                   }}
                 >
                   <div
                     style={{
-                      width: 40,
-                      height: 40,
+                      width: 32,
+                      height: 32,
                       borderRadius: "50%",
                       border: `3px solid ${GOLD}`,
                       display: "flex",
@@ -491,31 +289,31 @@ export default function ChannelPage({ params, searchParams }: PageProps) {
                         marginLeft: 2,
                         width: 0,
                         height: 0,
-                        borderTop: "8px solid transparent",
-                        borderBottom: "8px solid transparent",
-                        borderLeft: `14px solid ${GOLD}`,
+                        borderTop: "6px solid transparent",
+                        borderBottom: "6px solid transparent",
+                        borderLeft: `10px solid ${GOLD}`,
                       }}
                     />
                   </div>
                 </div>
 
-                <div style={{ marginTop: 12 }}>
+                <div style={{ marginTop: 8 }}>
                   <div
                     style={{
                       fontWeight: 700,
-                      fontSize: 14,
-                      marginBottom: 4,
+                      fontSize: 13,
+                      marginBottom: 2,
                     }}
                   >
-                    Video Title
+                    Short Title
                   </div>
                   <div
                     style={{
-                      fontSize: 12,
+                      fontSize: 11,
                       opacity: 0.85,
                     }}
                   >
-                    1.2K views · 6 days ago
+                    3.4K views · 2 days ago
                   </div>
                 </div>
               </article>
