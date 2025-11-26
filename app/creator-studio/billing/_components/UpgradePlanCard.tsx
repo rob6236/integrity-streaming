@@ -1,64 +1,64 @@
 // app/creator-studio/billing/_components/UpgradePlanCard.tsx
-
+import React from "react";
 import type { BillingPlan } from "./billingData";
+import { GOLD } from "./billingData";
 
-const GOLD = "#FFD700";
+const cardStyle: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  borderRadius: 24,
+  border: `3px solid ${GOLD}`,
+  padding: 24,
+  background: "rgba(0,0,0,0.22)",
+};
 
-type UpgradePlanCardProps = {
+type Props = {
   plan: BillingPlan;
 };
 
-export default function UpgradePlanCard({ plan }: UpgradePlanCardProps) {
+export default function UpgradePlanCard({ plan }: Props) {
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 260,
-        border: `1px solid ${GOLD}`,
-        borderRadius: 16,
-        padding: "20px 22px",
-        marginRight: 16,
-        boxShadow:
-          "0 0 0 1px rgba(255,215,0,0.4), inset 0 0 18px rgba(255,215,0,0.14)",
-      }}
-    >
-      <h3
+    <section style={cardStyle}>
+      <h2
         style={{
-          fontSize: 18,
-          fontWeight: 800,
+          fontSize: 24,
+          fontWeight: 900,
           color: GOLD,
-          marginBottom: 6,
+          margin: "0 0 16px",
         }}
       >
         Current Plan
-      </h3>
+      </h2>
+
       <p
         style={{
-          fontSize: 20,
-          fontWeight: 800,
-          marginBottom: 8,
+          margin: "0 0 8px",
+          fontSize: 18,
+          fontWeight: 900,
         }}
       >
-        {plan.name} — ${plan.pricePerMonth} / mo
+        {plan.name} — {plan.priceLabel}
       </p>
-      <p style={{ fontSize: 13, opacity: 0.95, marginBottom: 16 }}>
+
+      <p style={{ margin: "0 0 16px", fontSize: 14, lineHeight: 1.4 }}>
         Change/upgrade will go here when Stripe is connected.
       </p>
+
       <button
         type="button"
         style={{
-          padding: "10px 18px",
           borderRadius: 999,
-          border: `2px solid ${GOLD}`,
-          backgroundColor: "transparent",
-          color: "white",
-          fontWeight: 700,
-          fontSize: 14,
+          padding: "10px 26px",
+          border: `3px solid ${GOLD}`,
+          background: "transparent",
+          color: "#fff",
+          fontWeight: 800,
+          fontSize: 15,
           cursor: "pointer",
         }}
       >
         Manage plan
       </button>
-    </div>
+    </section>
   );
 }

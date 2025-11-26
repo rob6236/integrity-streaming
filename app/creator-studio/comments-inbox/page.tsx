@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import ThreadsList, { ThreadSummary } from "./_components/ThreadsList";
-import ConversationView, { CommentMessage } from "./_components/ConversationView";
+import ConversationView, {
+  CommentMessage,
+} from "./_components/ConversationView";
 import ModerationActions from "./_components/ModerationActions";
 import ReplyBox from "./_components/ReplyBox";
 
@@ -193,16 +195,17 @@ export default function CommentsInboxPage() {
           fontWeight: 700,
           marginBottom: 20,
           color: "#ffe8a1",
+          flexWrap: "wrap",
         }}
       >
         <Link
-          href="/creator-studio"
+          href="/creator-studio/dashboard"
           style={{ textDecoration: "none", color: "#ffe8a1" }}
         >
           Dashboard
         </Link>
         <Link
-          href="/creator-studio/content-library"
+          href="/creator-studio/library"
           style={{ textDecoration: "none", color: "#ffe8a1" }}
         >
           Content Library
@@ -230,19 +233,11 @@ export default function CommentsInboxPage() {
               fontWeight: 600,
             }}
           >
-            Inbox placeholder. Unified comments, filters, and replies will appear
-            here.
+            Inbox placeholder. Unified comments, filters, and replies will
+            appear here.
           </div>
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "minmax(220px, 260px) minmax(0, 2.1fr) minmax(260px, 1.1fr)",
-              gap: 18,
-              alignItems: "stretch",
-            }}
-          >
+          <div className="comments-grid">
             {/* Column 1: Threads */}
             <ThreadsList
               threads={threadSummaries}
@@ -282,6 +277,33 @@ export default function CommentsInboxPage() {
           </div>
         )}
       </section>
+
+      {/* Responsive layout just for this page */}
+      <style jsx>{`
+        .comments-grid {
+          display: grid;
+          grid-template-columns: minmax(220px, 260px) minmax(0, 2.1fr)
+            minmax(260px, 1.1fr);
+          gap: 18px;
+          align-items: stretch;
+        }
+
+        /* Tablet tweaks (keeps 3 columns) */
+        @media (max-width: 1024px) {
+          .comments-grid {
+            grid-template-columns: minmax(200px, 240px) minmax(0, 2fr)
+              minmax(220px, 1fr);
+          }
+        }
+
+        /* Mobile: one column, everything stacked and locked in view */
+        @media (max-width: 768px) {
+          .comments-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

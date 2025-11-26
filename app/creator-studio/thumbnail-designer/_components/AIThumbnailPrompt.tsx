@@ -1,37 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 
-type AIThumbnailPromptProps = {
-  onGenerate: (args: {
-    prompt: string;
-    stylePreset: string;
-    useBrandFrame: boolean;
-  }) => void;
+type GenerateArgs = {
+  prompt: string;
+  stylePreset: string;
+  useBrandFrame: boolean;
 };
 
-const STYLE_PRESETS = [
-  "Cinematic / High-Contrast",
-  "Soft Pastel",
-  "Bold Comic",
-  "Minimal Clean",
+type AIThumbnailPromptProps = {
+  onGenerate: (args: GenerateArgs) => void;
+};
+
+const stylePresets = [
+  "Bold, high-contrast YouTube style",
+  "Cinematic, film-look",
+  "Minimal, clean text",
+  "Playful, colorful",
 ];
 
 export default function AIThumbnailPrompt({ onGenerate }: AIThumbnailPromptProps) {
   const [prompt, setPrompt] = useState("");
-  const [stylePreset, setStylePreset] = useState(STYLE_PRESETS[0]);
+  const [stylePreset, setStylePreset] = useState(stylePresets[0]);
   const [useBrandFrame, setUseBrandFrame] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const trimmed = prompt.trim();
-    if (!trimmed) return;
+    if (!prompt.trim() || isGenerating) return;
 
     setIsGenerating(true);
     try {
       onGenerate({
-        prompt: trimmed,
+        prompt: prompt.trim(),
         stylePreset,
         useBrandFrame,
       });
@@ -41,64 +42,97 @@ export default function AIThumbnailPrompt({ onGenerate }: AIThumbnailPromptProps
   };
 
   return (
-    <section className="h-full flex flex-col">
-      <h3 className="text-xs font-semibold text-[#FFD700] mb-2 uppercase tracking-wide">
-        Step 1 · AI Instructions
-      </h3>
+    <form onSubmit={handleSubmit} className="space-y-3 text-sm">
+      <h2 className="text-base font-extrabold text-[#FFD700] tracking-wide mb-1">
+        STEP 1 · DESCRIBE YOUR THUMBNAIL
+      </h2>
 
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
-        <p className="text-xs text-white/75 mb-2">
-          Describe your thumbnail in detail. The more specific you are (emotion,
-          colors, subject, text), the better the AI can match your vision.
-        </p>
+      <p className="text-[11px] text-white/80 mb-1">
+        Write exactly what you want your thumbnail to look like and say. Include colors,
+        emotions, text, camera angle, subject, and any other details.
+      </p>
 
-        <label className="text-[11px] font-semibold text-[#FFD700] mb-1">
-          AI Prompt
-        </label>
-        <textarea
-          className="w-full flex-1 min-h-[120px] bg-black/60 border border-white/30 rounded-md text-sm text-white p-2 resize-vertical"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder={`Example: "Create a bold thumbnail for a tutorial on building a video platform. Dark burgundy background, gold glow, large white text saying BUILD YOUR OWN PLATFORM, creator on the left looking surprised, cinematic lighting."`}
-        />
+      {/* TALLER WHITE TEXT AREA */}
+      <textarea
+        id="thumbnail-prompt-box"
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        rows={8}
+        className="
+          w-full
+          rounded-sm
+          border-2
+          border-[#FFD700]
+          bg-white
+          text-black
+          text-sm
+          px-3
+          py-2
+          leading-relaxed
+          resize-vertical
+        "
+        placeholder="Write exactly what you want your thumbnail to look like and say. Include colors, emotions, text, camera angle, subject, and any other details…"
+      />
 
-        <div className="mt-3 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-[#FFD700]">
-              Style preset
-            </span>
-            <select
-              className="flex-1 bg-black/60 border border-white/40 text-xs text-white rounded px-2 py-1"
-              value={stylePreset}
-              onChange={(e) => setStylePreset(e.target.value)}
-            >
-              {STYLE_PRESETS.map((preset) => (
-                <option key={preset} value={preset}>
-                  {preset}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <label className="flex items-center gap-2 text-[11px] text-white/80">
-            <input
-              type="checkbox"
-              className="accent-[#FFD700]"
-              checked={useBrandFrame}
-              onChange={(e) => setUseBrandFrame(e.target.checked)}
-            />
-            Use Integrity Streaming gold frame styling
-          </label>
-
-          <button
-            type="submit"
-            disabled={isGenerating}
-            className="self-start mt-1 rounded-full border border-[#FFD700] bg-[#FFD700] text-[#7B0F24] text-xs font-semibold px-4 py-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+      {/* STYLE + BRAND FRAME ROW */}
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div className="flex-1">
+          <label
+            htmlFor="thumbnail-style-preset"
+            className="block text-[11px] font-semibold text-[#FFD700] mb-1 uppercase tracking-wide"
           >
-            {isGenerating ? "Generating…" : "Generate AI Thumbnails"}
-          </button>
+            Style preset
+          </label>
+          <select
+            id="thumbnail-style-preset"
+            value={stylePreset}
+            onChange={(e) => setStylePreset(e.target.value)}
+            className="w-full rounded-full border border-[#FFD700] bg-[#7B0F24] text-xs px-3 py-1.5 text-white font-semibold focus:outline-none focus:ring-1 focus:ring-[#FFD700]"
+            style={{ color: "#FFFFFF", fontWeight: 700 }}
+          >
+            {stylePresets.map((preset) => (
+              <option key={preset} value={preset}>
+                {preset}
+              </option>
+            ))}
+          </select>
         </div>
-      </form>
-    </section>
+
+        <label className="mt-1 md:mt-5 flex items-center gap-2 text-[11px] cursor-pointer">
+          <input
+            type="checkbox"
+            checked={useBrandFrame}
+            onChange={(e) => setUseBrandFrame(e.target.checked)}
+            className="h-3.5 w-3.5 rounded border-[#FFD700] text-[#FFD700] focus:ring-[#FFD700]"
+          />
+          <span className="text-white/80">
+            Use Integrity Streaming brand frame
+          </span>
+        </label>
+      </div>
+
+      {/* GENERATE BUTTON */}
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={!prompt.trim() || isGenerating}
+          className={`
+            rounded-full border border-[#FFD700]
+            px-4 py-1.5 text-xs font-semibold
+            transition-colors
+            ${
+              !prompt.trim() || isGenerating
+                ? "bg-[#FFD700]/40 text-white/70 cursor-not-allowed"
+                : "bg-[#FFD700] text-white hover:bg-[#ffe866] hover:border-[#ffe866]"
+            }
+          `}
+          style={{ color: "#FFFFFF", fontWeight: 700 }}
+        >
+          {isGenerating ? "Generating…" : "Generate 4 thumbnail concepts"}
+        </button>
+      </div>
+    </form>
   );
 }
+
+

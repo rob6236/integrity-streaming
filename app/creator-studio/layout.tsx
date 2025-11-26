@@ -27,7 +27,7 @@ export default function CreatorStudioLayout({
     <div>
       <style>{`
         :root{
-          --logo-box: 116px;
+          --logo-box: 100px;          /* slightly smaller logo */
           --logo-inset: 6px;
           --logo-radius: 18px;
           --nav-col: 220px;
@@ -37,35 +37,39 @@ export default function CreatorStudioLayout({
         a { text-decoration:none; }
 
         .gold-outline { box-shadow:${OUTLINE}; border-radius:16px; }
+
         .gold-btn {
           box-shadow:${OUTLINE};
           background:${PANEL_BG};
-          border-radius:14px;
-          padding:8px 18px;
+          border-radius:999px;
+          padding:6px 16px;
           color:#fff;
           font-weight:800;
           display:inline-flex;
           align-items:center;
           justify-content:center;
+          border:2px solid ${GOLD};
+          font-size:14px;
+          line-height:1.1;
+          white-space:nowrap;
         }
 
-        /* HEADER */
-        .header-wrap{
+        /* ============================
+           CREATOR STUDIO HEADER
+           (shorter overall + top padding space)
+           ============================ */
+
+        .creator-header{
           width:100%;
-          display:grid;
-          place-items:center;
-          padding:16px 12px 20px;
-        }
-        .header{
-          max-width:1100px;
-          width:100%;
-          display:grid;
-          grid-template-columns:auto 1fr auto;
+          display:flex;
+          flex-direction:column;
           align-items:center;
-          gap:16px;
+          justify-content:center;
+          gap:14px;                     /* was 18px */
           background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.12));
-          border-radius:18px;
-          padding:12px 16px;
+          border-radius:24px;
+          padding:12px 18px 16px;       /* less vertical padding */
+          margin-top:16px;              /* <— space above the header */
         }
 
         .logoBox{
@@ -87,28 +91,29 @@ export default function CreatorStudioLayout({
         }
 
         .title{
-          justify-self:center;
           text-align:center;
           line-height:1.06;
           font-style:italic;
           font-weight:900;
           color:${GOLD};
           text-shadow:2px 2px 0 #4a0b16, 3px 3px 0 rgba(0,0,0,0.55);
-          margin:0 8px;
+          margin:0;
         }
-        .title .top{ font-size:30px; }
-        .title .bottom{ font-size:26px; }
+        .title .top{ font-size:32px; }   /* slightly smaller */
+        .title .bottom{ font-size:20px; }
 
         .header-actions{
           display:flex;
           align-items:center;
-          gap:12px;
+          justify-content:center;
+          gap:16px;
+          flex-wrap:nowrap;              /* keep all three in one row */
         }
 
         /* PAGE GRID */
         .page{
           max-width:1200px;
-          margin:0 auto;
+          margin:20px auto 0;
           padding:0 16px 40px;
           display:grid;
           grid-template-columns:var(--nav-col) 1fr;
@@ -120,7 +125,7 @@ export default function CreatorStudioLayout({
           width:var(--nav-col);
           display:flex;
           flex-direction:column;
-          gap:12px;  /* increased spacing between buttons */
+          gap:12px;
           position:sticky;
           top:18px;
           height:fit-content;
@@ -148,18 +153,70 @@ export default function CreatorStudioLayout({
           color:#000;
         }
 
+        /* Tablet tweaks */
         @media (max-width:980px){
           .page{ grid-template-columns:1fr; }
           .sidenav{ width:100%; position:static; }
-          .title .top{ font-size:26px; }
-          .title .bottom{ font-size:22px; }
-          :root{ --logo-box: 104px; }
+          .title .top{ font-size:28px; }
+          .title .bottom{ font-size:18px; }
+          :root{ --logo-box: 90px; }
+        }
+
+        /* MOBILE ONLY:
+           even shorter header + skinny sidebar
+        */
+        @media (max-width:639px){
+          :root{
+            --nav-col: 96px;
+            --logo-box: 82px;
+          }
+
+          .creator-header{
+            padding:10px 12px 12px;   /* shorter */
+            gap:10px;                  /* tighter vertical spacing */
+            margin-top:16px;           /* keep same space above on mobile */
+          }
+
+          .title .top{ font-size:24px; }
+          .title .bottom{ font-size:16px; }
+
+          .gold-btn{
+            padding:4px 8px;
+            font-size:11px;
+          }
+
+          .header-actions{
+            gap:8px;
+          }
+
+          /* KEY CHANGE: lock the body width & kill horizontal scroll */
+          .page{
+            grid-template-columns: var(--nav-col) minmax(0, 1fr);
+            padding:0 8px 32px;        /* slightly less side padding */
+            overflow-x:hidden;
+          }
+
+          .page main{
+            width:100%;
+            max-width:100%;
+            overflow-x:hidden;         /* nothing in the body can cause horizontal scroll */
+          }
+
+          .sidenav{
+            width:var(--nav-col);
+            position:static;
+          }
+
+          .navBtn{
+            font-size:11px;
+            padding:6px 6px;
+          }
         }
       `}</style>
 
-      {/* HEADER */}
-      <div className="header-wrap">
-        <div className="header gold-outline">
+      {/* HEADER – between smileys via .header-shell */}
+      <div className="header-shell">
+        <div className="creator-header gold-outline">
           <div className="logoBox">
             <Image
               src="/logo.png"
@@ -177,8 +234,15 @@ export default function CreatorStudioLayout({
           </div>
 
           <div className="header-actions">
-            <Link href="/home" className="gold-btn">Home</Link>
-            <Link href="/logout" className="gold-btn">Logout</Link>
+            <Link href="/home" className="gold-btn">
+              Home
+            </Link>
+            <Link href="/channel/sample" className="gold-btn">
+              View Channel
+            </Link>
+            <Link href="/logout" className="gold-btn">
+              Logout
+            </Link>
           </div>
         </div>
       </div>
@@ -186,17 +250,67 @@ export default function CreatorStudioLayout({
       {/* MAIN */}
       <div className="page">
         <nav className="sidenav">
-          <Link href="/creator-studio/dashboard" className={navClass("/creator-studio/dashboard")}>Dashboard</Link>
-          <Link href="/creator-studio/library" className={navClass("/creator-studio/library")}>Content Library</Link>
-          <Link href="/creator-studio/upload" className={navClass("/creator-studio/upload")}>Upload</Link>
-          <Link href="/creator-studio/editor" className={navClass("/creator-studio/editor")}>Editor</Link>
-          <Link href="/creator-studio/thumbnail-designer" className={navClass("/creator-studio/thumbnail-designer")}>Thumbnail Designer</Link>
-          <Link href="/creator-studio/captions" className={navClass("/creator-studio/captions")}>Captions</Link>
-          <Link href="/creator-studio/monetization" className={navClass("/creator-studio/monetization")}>Monetization</Link>
-          <Link href="/creator-studio/posts" className={navClass("/creator-studio/posts")}>Posts (Social)</Link>
-          <Link href="/creator-studio/comments-inbox" className={navClass("/creator-studio/comments-inbox")}>Comments / Inbox</Link>
-          <Link href="/creator-studio/settings" className={navClass("/creator-studio/settings")}>Settings</Link>
-          <Link href="/creator-studio/billing" className={navClass("/creator-studio/billing")}>Billing</Link>
+          <Link
+            href="/creator-studio/dashboard"
+            className={navClass("/creator-studio/dashboard")}
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/creator-studio/library"
+            className={navClass("/creator-studio/library")}
+          >
+            Content Library
+          </Link>
+          <Link
+            href="/creator-studio/upload"
+            className={navClass("/creator-studio/upload")}
+          >
+            Upload
+          </Link>
+          <Link
+            href="/creator-studio/editor"
+            className={navClass("/creator-studio/editor")}
+          >
+            Editor
+          </Link>
+          <Link
+            href="/creator-studio/thumbnail-designer"
+            className={navClass("/creator-studio/thumbnail-designer")}
+          >
+            Thumbnail Designer
+          </Link>
+          {/* Captions link removed */}
+          <Link
+            href="/creator-studio/monetization"
+            className={navClass("/creator-studio/monetization")}
+          >
+            Monetization
+          </Link>
+          <Link
+            href="/creator-studio/posts"
+            className={navClass("/creator-studio/posts")}
+          >
+            Posts (Social)
+          </Link>
+          <Link
+            href="/creator-studio/comments-inbox"
+            className={navClass("/creator-studio/comments-inbox")}
+          >
+            Comments / Inbox
+          </Link>
+          <Link
+            href="/creator-studio/settings"
+            className={navClass("/creator-studio/settings")}
+          >
+            Settings
+          </Link>
+          <Link
+            href="/creator-studio/billing"
+            className={navClass("/creator-studio/billing")}
+          >
+            Billing
+          </Link>
         </nav>
 
         <main>{children}</main>

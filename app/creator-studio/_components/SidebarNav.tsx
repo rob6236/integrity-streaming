@@ -11,9 +11,8 @@ const items: Item[] = [
   { label: "Content Library",   href: "/creator-studio/library" },
   { label: "Upload",            href: "/creator-studio/upload" },
   { label: "Editor",            href: "/creator-studio/editor" },
-  // ✅ Corrected route
   { label: "Thumbnail Designer", href: "/creator-studio/thumbnail-designer" },
-  { label: "Captions",          href: "/creator-studio/captions" },
+  // Captions removed on purpose
   { label: "Monetization",      href: "/creator-studio/monetization" },
   { label: "Posts (Social)",    href: "/creator-studio/posts" },
   { label: "Comments / Inbox",  href: "/creator-studio/inbox" },

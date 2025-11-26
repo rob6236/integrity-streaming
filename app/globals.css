@@ -261,3 +261,8 @@ header h1 {
     font-size: 13px !important;
   }
 }
+
+/* Force taller prompt box in Thumbnail Designer */
+#thumbnail-prompt-box {
+  min-height: 220px !important;  /* increase this number if you want it even taller */
+}

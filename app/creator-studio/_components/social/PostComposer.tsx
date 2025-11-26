@@ -1,9 +1,8 @@
-// app/creator-studio/posts/_components/ComposerCard.tsx
 "use client";
 
 import React from "react";
 
-export default function ComposerCard() {
+const PostComposer: React.FC = () => {
   return (
     <div
       className="
@@ -13,6 +12,8 @@ export default function ComposerCard() {
         p-6
         text-[#FFF9F0]
         box-border
+        w-full
+        max-w-full
       "
     >
       {/* Title */}
@@ -54,6 +55,8 @@ export default function ComposerCard() {
             text-center
             text-sm
             text-[#666666]
+            w-full
+            max-w-full
           "
         >
           Meme placeholder (no image selected)
@@ -77,14 +80,14 @@ export default function ComposerCard() {
         <p className="text-xs opacity-80 md:text-sm">0/1500 characters</p>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* MOBILE: even smaller; TABLET+DESKTOP: same as before */}
+          {/* MOBILE: smaller; TABLET+DESKTOP: larger (original) size */}
           <button
             className="
               rounded-full
               bg-[#FFD700]
               text-[#7B0F24]
               font-semibold
-              text-[10px] px-2 py-1
+              text-xs px-3 py-1.5
               md:text-sm md:px-5 md:py-2.5
             "
           >
@@ -97,7 +100,7 @@ export default function ComposerCard() {
               bg-[#FFD700]
               text-[#7B0F24]
               font-semibold
-              text-[10px] px-2 py-1
+              text-xs px-3 py-1.5
               md:text-sm md:px-5 md:py-2.5
             "
           >
@@ -107,4 +110,6 @@ export default function ComposerCard() {
       </div>
     </div>
   );
-}
+};
+
+export default PostComposer;

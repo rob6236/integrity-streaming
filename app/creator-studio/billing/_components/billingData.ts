@@ -1,53 +1,51 @@
 // app/creator-studio/billing/_components/billingData.ts
 
+export const GOLD = "#FFD700";
+
 export type BillingPlan = {
-  id: string;
   name: string;
-  pricePerMonth: number;
-  currency: string;
-  status: "trialing" | "active" | "canceled";
-  renewsOn?: string; // e.g. "Dec 31, 2025"
+  priceLabel: string;   // e.g. "$0 / mo"
+  statusLabel: string;  // e.g. "trialing"
 };
 
 export type PaymentMethod = {
-  id: string;
-  brand: string; // e.g. "Visa"
-  last4: string;
-  expMonth: number;
-  expYear: number;
+  brand: string;        // e.g. "Visa"
+  last4: string;        // e.g. "4242"
+  expMonth: number;     // e.g. 12
+  expYear: number;      // e.g. 2030
 };
 
 export type Invoice = {
   id: string;
-  date: string; // human-readable for now
-  amount: number;
-  currency: string;
-  status: "paid" | "open" | "void" | "uncollectible";
-  downloadUrl?: string;
+  dateLabel: string;    // e.g. "Nov 1, 2025"
+  amountLabel: string;  // e.g. "$29.00"
+  statusLabel: string;  // e.g. "Paid"
 };
 
 export type BillingSummary = {
   plan: BillingPlan;
-  paymentMethod?: PaymentMethod;
+  paymentMethod: PaymentMethod;
   invoices: Invoice[];
 };
 
-// 🔹 Mock data for now (UI-only). Later we can replace this with real Stripe data.
 export const mockBillingSummary: BillingSummary = {
   plan: {
-    id: "creator-basic",
     name: "Creator",
-    pricePerMonth: 0,
-    currency: "USD",
-    status: "trialing",
-    renewsOn: "TBD",
+    priceLabel: "$0 / mo",
+    statusLabel: "trialing",
   },
   paymentMethod: {
-    id: "pm_4242",
     brand: "Visa",
     last4: "4242",
     expMonth: 12,
     expYear: 2030,
   },
-  invoices: [],
+  invoices: [
+    {
+      id: "inv_001",
+      dateLabel: "Nov 1, 2025",
+      amountLabel: "$0.00",
+      statusLabel: "Trial",
+    },
+  ],
 };

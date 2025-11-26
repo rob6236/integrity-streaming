@@ -4,12 +4,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { auth } from "@/lib/firebase";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { updateProfile, updateEmail } from "firebase/auth";
 
@@ -132,16 +127,10 @@ export default function SettingsPage() {
 
         if (snap.exists()) {
           const data = snap.data() as any;
-          setAccountName(
-            data.displayName || current.displayName || ""
-          );
+          setAccountName(data.displayName || current.displayName || "");
           setAccountEmail(data.email || current.email || "");
-          setLanguage(
-            data.language || "en-US"
-          );
-          setRegion(
-            data.region || "US"
-          );
+          setLanguage(data.language || "en-US");
+          setRegion(data.region || "US");
         } else {
           // No Firestore doc yet – seed from Auth
           setAccountName(current.displayName || "");
@@ -264,18 +253,13 @@ export default function SettingsPage() {
     const current = auth.currentUser;
     if (!current) {
       setSaveStatus("error");
-      setSaveMessage(
-        "You must be logged in to save your settings."
-      );
+      setSaveMessage("You must be logged in to save your settings.");
       return;
     }
 
     try {
       // 1) Update display name in Auth, if changed
-      if (
-        accountName &&
-        current.displayName !== accountName
-      ) {
+      if (accountName && current.displayName !== accountName) {
         await updateProfile(current, {
           displayName: accountName,
         });
@@ -285,11 +269,7 @@ export default function SettingsPage() {
       // If this fails, we still save everything else.
       let emailToSave = accountEmail || current.email || "";
 
-      if (
-        accountEmail &&
-        current.email &&
-        current.email !== accountEmail
-      ) {
+      if (accountEmail && current.email && current.email !== accountEmail) {
         try {
           await updateEmail(current, accountEmail);
           emailToSave = accountEmail;
@@ -309,8 +289,7 @@ export default function SettingsPage() {
       await setDoc(
         userRef,
         {
-          displayName:
-            accountName || current.displayName || "",
+          displayName: accountName || current.displayName || "",
           email: emailToSave,
           language,
           region,
@@ -320,9 +299,7 @@ export default function SettingsPage() {
       );
 
       // If we didn't already set a warning above, mark as success
-      setSaveStatus((prev) =>
-        prev === "warning" ? "warning" : "success"
-      );
+      setSaveStatus((prev) => (prev === "warning" ? "warning" : "success"));
       setSaveMessage((prev) =>
         prev && saveStatus === "warning"
           ? prev
@@ -332,8 +309,7 @@ export default function SettingsPage() {
       console.error("Error saving account settings:", err);
       setSaveStatus("error");
       setSaveMessage(
-        err?.message ||
-          "Something went wrong saving your settings. Please try again."
+        err?.message || "Something went wrong saving your settings. Please try again."
       );
     }
   };
@@ -376,16 +352,15 @@ export default function SettingsPage() {
           maxWidth: 680,
         }}
       >
-        Adjust how your account and channel work. These settings
-        control your overall Integrity Streaming experience as a
-        viewer and creator.
+        Adjust how your account and channel work. These settings control your
+        overall Integrity Streaming experience as a viewer and creator.
       </p>
 
       {/* Inner layout */}
       <div
+        className="settings-grid"
         style={{
           display: "grid",
-          gridTemplateColumns: "260px 1fr",
           gap: 24,
           alignItems: "flex-start",
         }}
@@ -416,9 +391,7 @@ export default function SettingsPage() {
                   padding: "10px 12px",
                   marginBottom: 6,
                   borderRadius: 12,
-                  border: isActive
-                    ? `2px solid ${GOLD}`
-                    : "2px solid transparent",
+                  border: isActive ? `2px solid ${GOLD}` : "2px solid transparent",
                   backgroundColor: isActive
                     ? "rgba(255,215,0,.18)"
                     : "transparent",
@@ -472,11 +445,7 @@ export default function SettingsPage() {
               Loading your account details…
             </p>
           ) : (
-            renderSectionContent(
-              activeSectionId,
-              advancedActions,
-              accountState
-            )
+            renderSectionContent(activeSectionId, advancedActions, accountState)
           )}
 
           {/* Save bar */}
@@ -494,8 +463,8 @@ export default function SettingsPage() {
           >
             <div style={{ fontSize: 13, opacity: 0.8 }}>
               <div>
-                Changes (other than deletion) will be wired to your
-                account in a later step. (UI only for now.)
+                Changes (other than deletion) will be wired to your account in a
+                later step. (UI only for now.)
               </div>
               {saveMessage && (
                 <div
@@ -527,20 +496,28 @@ export default function SettingsPage() {
                   saveStatus === "saving" ? "#ffe58a" : GOLD,
                 color: "#000",
                 fontWeight: 800,
-                cursor:
-                  saveStatus === "saving"
-                    ? "default"
-                    : "pointer",
+                cursor: saveStatus === "saving" ? "default" : "pointer",
                 minWidth: 140,
               }}
             >
-              {saveStatus === "saving"
-                ? "Saving..."
-                : "Save changes"}
+              {saveStatus === "saving" ? "Saving..." : "Save changes"}
             </button>
           </div>
         </section>
       </div>
+
+      {/* Mobile-only layout adjustments */}
+      <style jsx>{`
+        .settings-grid {
+          grid-template-columns: 260px 1fr;
+        }
+
+        @media (max-width: 768px) {
+          .settings-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -656,8 +633,7 @@ function renderSectionContent(
           <FieldGroup title="Channel visibility">
             <label style={checkboxRowStyle}>
               <input type="checkbox" style={{ marginRight: 8 }} />
-              Make my channel discoverable in search and
-              recommendations
+              Make my channel discoverable in search and recommendations
             </label>
             <label style={checkboxRowStyle}>
               <input type="checkbox" style={{ marginRight: 8 }} />
@@ -676,8 +652,8 @@ function renderSectionContent(
               <option>Private</option>
             </select>
             <p style={helpTextStyle}>
-              This is only the default. You can still change privacy
-              for each video on the Upload or Content Library pages.
+              This is only the default. You can still change privacy for each
+              video on the Upload or Content Library pages.
             </p>
           </FieldGroup>
         </div>
@@ -697,8 +673,7 @@ function renderSectionContent(
             </label>
             <label style={checkboxRowStyle}>
               <input type="checkbox" style={{ marginRight: 8 }} />
-              Send me viewer activity summaries (likes, comments,
-              follows)
+              Send me viewer activity summaries (likes, comments, follows)
             </label>
           </FieldGroup>
 
@@ -709,8 +684,7 @@ function renderSectionContent(
             </label>
             <label style={checkboxRowStyle}>
               <input type="checkbox" style={{ marginRight: 8 }} />
-              Show notifications when my videos are approved or
-              flagged
+              Show notifications when my videos are approved or flagged
             </label>
           </FieldGroup>
         </div>
@@ -736,8 +710,7 @@ function renderSectionContent(
             </label>
             <label style={checkboxRowStyle}>
               <input type="checkbox" style={{ marginRight: 8 }} />
-              Prefer auto-generated captions when no manual captions
-              exist
+              Prefer auto-generated captions when no manual captions exist
             </label>
           </FieldGroup>
 
@@ -782,8 +755,8 @@ function renderSectionContent(
         <div style={{ display: "grid", gap: 16 }}>
           <FieldGroup title="Connected apps">
             <p style={helpTextStyle}>
-              In the future you&apos;ll be able to connect editing
-              tools, scheduling apps, and other platforms here.
+              In the future you&apos;ll be able to connect editing tools,
+              scheduling apps, and other platforms here.
             </p>
 
             <div
@@ -806,10 +779,9 @@ function renderSectionContent(
         <div style={{ display: "grid", gap: 16 }}>
           <FieldGroup title="Subscription overview">
             <p style={helpTextStyle}>
-              Billing details, invoices, and payment methods are
-              managed on the{" "}
-              <strong>Billing</strong> page so we don&apos;t
-              duplicate controls in multiple places.
+              Billing details, invoices, and payment methods are managed on the{" "}
+              <strong>Billing</strong> page so we don&apos;t duplicate controls
+              in multiple places.
             </p>
 
             <Link
@@ -837,10 +809,10 @@ function renderSectionContent(
         <div style={{ display: "grid", gap: 20 }}>
           <FieldGroup title="Delete your Integrity Streaming account">
             <p style={helpTextStyle}>
-              This will permanently delete your Integrity Streaming
-              account, channels, videos, thumbnails, comments, likes,
-              and any other data linked to your profile. This action
-              happens automatically and cannot be undone.
+              This will permanently delete your Integrity Streaming account,
+              channels, videos, thumbnails, comments, likes, and any other data
+              linked to your profile. This action happens automatically and
+              cannot be undone.
             </p>
             <button
               type="button"
@@ -856,9 +828,7 @@ function renderSectionContent(
                   : "transparent",
                 color: "#ffb3b3",
                 fontWeight: 800,
-                cursor: actions.isDeletingAccount
-                  ? "default"
-                  : "pointer",
+                cursor: actions.isDeletingAccount ? "default" : "pointer",
               }}
             >
               {actions.isDeletingAccount
@@ -869,9 +839,9 @@ function renderSectionContent(
 
           <FieldGroup title="Delete your creator channel only">
             <p style={helpTextStyle}>
-              This removes your creator channel, channel videos,
-              thumbnails, and posts but keeps your viewer account so
-              you can still watch and follow other creators.
+              This removes your creator channel, channel videos, thumbnails, and
+              posts but keeps your viewer account so you can still watch and
+              follow other creators.
             </p>
             <button
               type="button"
@@ -887,9 +857,7 @@ function renderSectionContent(
                   : "transparent",
                 color: "#ffd6a3",
                 fontWeight: 800,
-                cursor: actions.isDeletingChannel
-                  ? "default"
-                  : "pointer",
+                cursor: actions.isDeletingChannel ? "default" : "pointer",
               }}
             >
               {actions.isDeletingChannel

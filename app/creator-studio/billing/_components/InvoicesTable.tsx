@@ -1,142 +1,91 @@
 // app/creator-studio/billing/_components/InvoicesTable.tsx
-
+import React from "react";
 import type { Invoice } from "./billingData";
+import { GOLD } from "./billingData";
 
-const GOLD = "#FFD700";
+const cardStyle: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  borderRadius: 24,
+  border: `3px solid ${GOLD}`,
+  padding: 24,
+  background: "rgba(0,0,0,0.22)",
+};
 
-type InvoicesTableProps = {
+type Props = {
   invoices: Invoice[];
 };
 
-export default function InvoicesTable({ invoices }: InvoicesTableProps) {
+export default function InvoicesTable({ invoices }: Props) {
   const hasInvoices = invoices.length > 0;
 
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 260,
-        border: `1px solid ${GOLD}`,
-        borderRadius: 16,
-        padding: "20px 22px",
-        boxShadow:
-          "0 0 0 1px rgba(255,215,0,0.4), inset 0 0 18px rgba(255,215,0,0.14)",
-      }}
-    >
-      <h3
+    <section style={cardStyle}>
+      <h2
         style={{
-          fontSize: 18,
-          fontWeight: 800,
+          fontSize: 24,
+          fontWeight: 900,
           color: GOLD,
-          marginBottom: 6,
+          margin: "0 0 16px",
         }}
       >
         Invoices
-      </h3>
+      </h2>
 
       {!hasInvoices && (
-        <>
-          <p
-            style={{
-              fontSize: 14,
-              marginBottom: 4,
-            }}
-          >
-            No invoices yet.
-          </p>
-          <p style={{ fontSize: 13, opacity: 0.95 }}>
-            We&apos;ll show downloadable PDFs here once you begin billing.
-          </p>
-        </>
+        <p style={{ margin: 0, fontSize: 14 }}>No invoices yet.</p>
       )}
 
       {hasInvoices && (
-        <div
+        <table
           style={{
-            marginTop: 10,
-            maxHeight: 220,
-            overflowY: "auto",
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: 14,
           }}
         >
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              fontSize: 14,
-            }}
-          >
-            <thead>
-              <tr>
-                <th
-                  style={{
-                    textAlign: "left",
-                    padding: "6px 4px",
-                    borderBottom: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                >
-                  Date
-                </th>
-                <th
-                  style={{
-                    textAlign: "left",
-                    padding: "6px 4px",
-                    borderBottom: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                >
-                  Amount
-                </th>
-                <th
-                  style={{
-                    textAlign: "left",
-                    padding: "6px 4px",
-                    borderBottom: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                >
-                  Status
-                </th>
-                <th
-                  style={{
-                    textAlign: "left",
-                    padding: "6px 4px",
-                    borderBottom: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                >
-                  Receipt
-                </th>
+          <thead>
+            <tr>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "4px 0",
+                  fontWeight: 700,
+                }}
+              >
+                Date
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "4px 0",
+                  fontWeight: 700,
+                }}
+              >
+                Amount
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
+                  padding: "4px 0",
+                  fontWeight: 700,
+                }}
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoices.map((inv) => (
+              <tr key={inv.id}>
+                <td style={{ padding: "4px 0" }}>{inv.dateLabel}</td>
+                <td style={{ padding: "4px 0" }}>{inv.amountLabel}</td>
+                <td style={{ padding: "4px 0" }}>{inv.statusLabel}</td>
               </tr>
-            </thead>
-            <tbody>
-              {invoices.map((inv) => (
-                <tr key={inv.id}>
-                  <td style={{ padding: "6px 4px" }}>{inv.date}</td>
-                  <td style={{ padding: "6px 4px" }}>
-                    ${inv.amount.toFixed(2)} {inv.currency}
-                  </td>
-                  <td style={{ padding: "6px 4px", textTransform: "capitalize" }}>
-                    {inv.status}
-                  </td>
-                  <td style={{ padding: "6px 4px" }}>
-                    {inv.downloadUrl ? (
-                      <a
-                        href={inv.downloadUrl}
-                        style={{
-                          color: GOLD,
-                          fontWeight: 600,
-                          textDecoration: "underline",
-                        }}
-                      >
-                        Download
-                      </a>
-                    ) : (
-                      "-"
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       )}
-    </div>
+    </section>
   );
 }

@@ -1,77 +1,66 @@
 // app/creator-studio/billing/_components/PaymentMethodsTable.tsx
-
+import React from "react";
 import type { PaymentMethod } from "./billingData";
+import { GOLD } from "./billingData";
 
-const GOLD = "#FFD700";
-
-type PaymentMethodsTableProps = {
-  paymentMethod?: PaymentMethod;
+const cardStyle: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  borderRadius: 24,
+  border: `3px solid ${GOLD}`,
+  padding: 24,
+  background: "rgba(0,0,0,0.22)",
 };
 
-export default function PaymentMethodsTable({
-  paymentMethod,
-}: PaymentMethodsTableProps) {
+type Props = {
+  paymentMethod: PaymentMethod;
+};
+
+export default function PaymentMethodsTable({ paymentMethod }: Props) {
+  const { brand, last4, expMonth, expYear } = paymentMethod;
+
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 260,
-        border: `1px solid ${GOLD}`,
-        borderRadius: 16,
-        padding: "20px 22px",
-        marginRight: 16,
-        boxShadow:
-          "0 0 0 1px rgba(255,215,0,0.4), inset 0 0 18px rgba(255,215,0,0.14)",
-      }}
-    >
-      <h3
+    <section style={cardStyle}>
+      <h2
         style={{
-          fontSize: 18,
-          fontWeight: 800,
+          fontSize: 24,
+          fontWeight: 900,
           color: GOLD,
-          marginBottom: 6,
+          margin: "0 0 16px",
         }}
       >
         Payment Method
-      </h3>
+      </h2>
 
-      {paymentMethod ? (
-        <>
-          <p
-            style={{
-              fontSize: 16,
-              fontWeight: 700,
-              marginBottom: 4,
-            }}
-          >
-            {paymentMethod.brand} •••• •••• •••• {paymentMethod.last4}
-          </p>
-          <p style={{ fontSize: 13, opacity: 0.95, marginBottom: 16 }}>
-            Expires {paymentMethod.expMonth.toString().padStart(2, "0")}/
-            {paymentMethod.expYear}
-          </p>
-        </>
-      ) : (
-        <p style={{ fontSize: 14, marginBottom: 16 }}>
-          No payment method on file yet.
-        </p>
-      )}
+      <p
+        style={{
+          margin: "0 0 8px",
+          fontSize: 18,
+          fontWeight: 900,
+        }}
+      >
+        {brand} •••• •••• •••• {last4}
+      </p>
+
+      <p style={{ margin: "0 0 16px", fontSize: 14 }}>
+        Expires {expMonth.toString().padStart(2, "0")}/{expYear}
+      </p>
 
       <button
         type="button"
         style={{
-          padding: "10px 18px",
           borderRadius: 999,
-          border: `2px solid ${GOLD}`,
-          backgroundColor: "transparent",
-          color: "white",
-          fontWeight: 700,
-          fontSize: 14,
+          padding: "10px 26px",
+          border: `3px solid ${GOLD}`,
+          background: "transparent",
+          color: "#fff",
+          fontWeight: 800,
+          fontSize: 15,
           cursor: "pointer",
         }}
       >
         Update card
       </button>
-    </div>
+    </section>
   );
 }
